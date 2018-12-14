@@ -11,13 +11,11 @@
 version: "3.2"
 services:
   node:
-    image: um_image_name_you_built
-#    build:                        # build using Dockerfile
-#      context: .                  # context, installation folder
-#      dockerfile: Dockerfile      # which contains instructions to build the image
-#      args:
-#        - TAG
-#        - __instance_name=umserver
+    build:                        # build using Dockerfile
+      context: .                  # context, installation folder
+      dockerfile: Dockerfile      # which contains instructions to build the image
+      args:
+        - __instance_name=umserver
     container_name: umcontainer
     ports:                         # expose the um server port
      - "9010:9000"
