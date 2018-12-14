@@ -17,7 +17,6 @@ services:
 #      dockerfile: Dockerfile      # which contains instructions to build the image
 #      args:
 #        - TAG
-#        - __host_sag_home=/opt/softwareag
 #        - __instance_name=umserver
     container_name: umcontainer
     ports:                         # expose the um server port
@@ -27,7 +26,7 @@ services:
      - um_logs:/opt/softwareag/UniversalMessaging/server/umserver/logs
      - um_licence:/opt/softwareag/UniversalMessaging/server/umserver/licence
      - um_users:/opt/softwareag/common/conf
-    environment:                  # runtime parameters for the um server
+#    environment:                  # runtime parameters for the um server
 #     - REALM_NAME=umcontainer
 #     - INIT_JAVA_MEM_SIZE
 #     - MAX_JAVA_MEM_SIZE
