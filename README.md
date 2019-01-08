@@ -26,9 +26,9 @@ This package makes the following assumptions:
 * You have Universal Messaging 10.x installed on a 64-bit Linux machine using the Software AG installer.
 * A Universal Messaging realm server instance has been created.
 * Docker Docker 17.09.1-ce or later is installed and its daemon is running 
-[link to Google!](https://docs.docker.com/installation/#installation).
+[link to docker install documentation!](https://docs.docker.com/installation/#installation).
 * Docker Compose 1.22.0 or later is installed
-[link to Google!](https://docs.docker.com/compose/install/).
+[link to docker compose install documentation!](https://docs.docker.com/compose/install/).
 * You are logged in as a non-root user, e.g., sagadmin.
 
 Building a Docker image
@@ -135,8 +135,8 @@ configuration and state changes you made previously have persisted.
 
 Using runUMTool.sh, you can create/update/get/delete assets on the UM realm server.
 You can use the runUMTool from the running container by using 'docker exec',
-without getting into the container. Documentation link for use of runUMTool 
-[link to Google!](https://documentation.softwareag.com/onlinehelp/Rohan/num10-3/10-3_UM_webhelp/index.html#page/um-webhelp%2Fto-header_clu_syntax_reference.html%23)
+without getting into the container. [documentation link to usage of runUMTool!]
+(https://documentation.softwareag.com/onlinehelp/Rohan/num10-3/10-3_UM_webhelp/index.html#page/um-webhelp%2Fto-header_clu_syntax_reference.html%23)
 
 	docker exec umcontainer runUMTool.sh ListChannels -rname=nsp://localhost:9000
 
