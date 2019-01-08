@@ -135,8 +135,7 @@ configuration and state changes you made previously have persisted.
 
 Using runUMTool.sh, you can create/update/get/delete assets on the UM realm server.
 You can use the runUMTool from the running container by using 'docker exec',
-without getting into the container. [documentation link to usage of runUMTool!]
-(https://documentation.softwareag.com/onlinehelp/Rohan/num10-3/10-3_UM_webhelp/index.html#page/um-webhelp%2Fto-header_clu_syntax_reference.html%23)
+without getting into the container. [documentation link to usage of runUMTool!](https://documentation.softwareag.com/onlinehelp/Rohan/num10-3/10-3_UM_webhelp/index.html#page/um-webhelp%2Fto-header_clu_syntax_reference.html%23)
 
 	docker exec umcontainer runUMTool.sh ListChannels -rname=nsp://localhost:9000
 
