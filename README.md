@@ -135,7 +135,7 @@ configuration and state changes you made previously have persisted.
 
 Using runUMTool.sh, you can create/update/get/delete assets on the UM realm server.
 You can use the runUMTool from the running container by using 'docker exec',
-without getting into the container. [documentation link to usage of runUMTool!](https://documentation.softwareag.com/onlinehelp/Rohan/num10-3/10-3_UM_webhelp/index.html#page/um-webhelp%2Fto-header_clu_syntax_reference.html%23)
+without getting into the container. [link to usage of runUMTool documentation!](https://documentation.softwareag.com/onlinehelp/Rohan/num10-3/10-3_UM_webhelp/index.html#page/um-webhelp%2Fto-header_clu_syntax_reference.html%23)
 
 	docker exec umcontainer runUMTool.sh ListChannels -rname=nsp://localhost:9000
 
@@ -180,17 +180,59 @@ the Docker host machine.
 
 Docker-compose (to run multiple docker container)
 =================================================
-The Docker Compose tool, '*docker-compose*'  automates the creation,
+The Docker Compose tool, 'docker-compose' automates the creation,
 deployment and interaction of multiple Docker
-containers from a configuration file, typically '*docker-compose.yml*'.
+containers from a configuration file, typically 'docker-compose.yml'.
 
-You need to copy the sample docker-compose file into the root of your Software AG installation.
+You need to copy the sample docker-compose i.e., '**docker-compose.yml**' file into the root of your Software AG installation.
 
 The Docker-compose 'up' command will create the container from the configurations and run the container.
-Using docker-compose, you can create named volumes.
 
 	docker-compose up
 	
 To stop the container, you can use the following command:
 
 	docker-compose down
+
+You can configure the image name which you have build using the '*docker build*' commands mentioned above in the docker-compose.
+
+	version:"3.2"
+	services:
+	  node:
+		image:universalmessaging-server:10.x
+
+If you want to build the image using docker file by passing build time arguments. You can configure them as follows:
+
+	version:"3.2"
+	services:
+	  node:
+		build:
+		  context: .
+		  dockerfile: Dockerfile-alternate
+          args:
+			- BASE_IMAGE=centos
+        	- TAG=7
+			- __instance_name=umserver
+
+You can configure container name and exposed and mapped ports as well. 
+
+	version:"3.2"
+	services:
+	  node:
+		image:universalmessaging-server:10.x
+		container_name: umcontainer
+		ports:    
+		 - "9010:9000"
+		 
+You can configure the named volumes for the directories which you would like store.
+	
+	volumes:
+     - um_data:/opt/softwareag/UniversalMessaging/server/umserver/data
+	 
+You can configure the runtime parameters which you would like to pass to container at runtime.
+
+	environment:
+     - REALM_NAME=umcontainer    
+
+You can find sample docker-compose.yml file along with Dockerfile and other scripts. 
+For more configuration changes, please go through [docker compose documentation!](https://docs.docker.com/compose/)
