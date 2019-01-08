@@ -9,8 +9,6 @@
 # See the License for the specific language governing permissions and limitations under the License.
 #
 
-# common/bin/certtool.sh - this is basically used when we generate the certificates. I am keeping it as it is. And need to add the dockerfile run.sh for replacing path [Check]
-
 common/bin/protoc
 common/bin/wrapper-3.5.29
 
