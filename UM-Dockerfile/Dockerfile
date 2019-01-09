@@ -31,19 +31,19 @@ USER 1724
 
 FROM base
 
-# Installation Specific build arguments can passed via command line using --build-args
+# __instance_name: If user want to copy the specific instance content to image, they can specifiy here. Default instance name is 'umserver'
 ARG __instance_name=umserver
 
 MAINTAINER SoftwareAG
 
 # Environment variables
-ENV INSTANCE_NAME=$__instance_name 
-ENV	UM_HOME=$SAG_HOME/UniversalMessaging
+ENV INSTANCE_NAME=$__instance_name
+ENV UM_HOME=$SAG_HOME/UniversalMessaging
 ENV PORT=9000 \
-	DATA_DIR=$UM_HOME/server/$INSTANCE_NAME/data \
+    DATA_DIR=$UM_HOME/server/$INSTANCE_NAME/data \
     LOG_DIR=$UM_HOME/server/$INSTANCE_NAME/logs \ 
     LIC_DIR=$UM_HOME/server/$INSTANCE_NAME/licence \ 
-    CONF_DIR=$SAG_HOME/common/conf \
+    USERS_DIR=$SAG_HOME/common/conf \
     SERVER_COMMON_CONF_FILE=Server_Common.conf \
     TOOLS_DIR=$UM_HOME/tools
 
@@ -54,7 +54,7 @@ RUN mkdir -p $SAG_HOME/common && chown 1724:1724 $SAG_HOME/common
 # Copy the required binaries from installation to image
 COPY --chown=1724:1724 ./common/bin/ $SAG_HOME/common/bin/
 COPY --chown=1724:1724 ./common/lib/ $SAG_HOME/common/lib/
-COPY --chown=1724:1724 ./common/conf/users.txt $CONF_DIR/users.txt
+COPY --chown=1724:1724 ./common/conf/users.txt $USERS_DIR/users.txt
 COPY --chown=1724:1724 ./UniversalMessaging/server/$INSTANCE_NAME/bin $UM_HOME/server/$INSTANCE_NAME/bin
 COPY --chown=1724:1724 ./UniversalMessaging/lib/ $UM_HOME/lib/
 COPY --chown=1724:1724 ./UniversalMessaging/classes/ $UM_HOME/classes/
@@ -80,7 +80,7 @@ RUN chmod u+x $SAG_HOME/configure.sh ;\
 ENV PATH=$TOOLS_DIR/runner/:$PATH
 
 # Create the Persistent storage for data directory, logs directory, licence directory and users directory
-VOLUME [ "$DATA_DIR", "$LOG_DIR", "$LIC_DIR", "$CONF_DIR" ]
+VOLUME [ "$DATA_DIR", "$LOG_DIR", "$LIC_DIR", "$USERS_DIR" ]
 
 # Change the work directory, where the entry point script is present.
 WORKDIR $SAG_HOME
