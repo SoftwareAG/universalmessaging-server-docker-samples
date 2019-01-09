@@ -15,7 +15,7 @@ Universal Messaging packaging kit for Docker
 ============================================
 This package contains configurations to help you containerize, run
 and configure the Universal Messaging realm server and also run the Universal Messaging 
-command line tool to administrate the Universal Messaging realm server
+command line tools to administrate the Universal Messaging realm server
 on the Docker platform.
 
 Prerequisites
@@ -23,19 +23,19 @@ Prerequisites
 This package makes the following assumptions:
 
 * You have some familiarity with the Docker technology.
-* You have Universal Messaging 10.x installed on a 64-bit Linux machine using the Software AG installer.
+* You have Universal Messaging 10.3 or above installed on a 64-bit Linux machine using the Software AG installer.
 * A Universal Messaging realm server instance has been created.
 * Docker Docker 17.09.1-ce or later is installed and its daemon is running 
-[link to docker install documentation!](https://docs.docker.com/installation/#installation).
+[link to docker install documentation](https://docs.docker.com/installation/#installation).
 * Docker Compose 1.22.0 or later is installed
-[link to docker compose install documentation!](https://docs.docker.com/compose/install/).
+[link to docker compose install documentation](https://docs.docker.com/compose/install/).
 * You are logged in as a non-root user, e.g., sagadmin.
 
 Building a Docker image
 =======================
 The file `Dockerfile` is a Dockerfile that can be used to turn your
 Universal Messaging installation into a Docker image, which can then be used
-to run the realm server as well as run the runUMTool as a client on the running server.
+to run the realm server as well as run the command line tools as a client on the running server.
 
 !!!The '**Dockerfile**', '**configure.sh**' and '**umstart.sh**' files should be copied into the root of your Software AG installation
 !!!(e.g. '/opt/softwareag/'). 
@@ -43,17 +43,20 @@ to run the realm server as well as run the runUMTool as a client on the running 
 From that directory, Docker can be asked to build
 the image using instructions from the Dockerfile:
 
-	docker build --tag universalmessaging-server:10.x .
+	docker build --build-arg __instance_name=testserver --tag universalmessaging-server:1 .
+	
+**__instance_name**: This Specific instance content copied to the image. Default instance name is 'umserver'. If you want to copy different instance content,
+specify the instance name here.
 
 Docker will output its progress, and after a minute or so will exit with a
 message like:
 
 	Successfully built 5b733a9b987d
-	Successfully tagged universalmessaging:10.x
+	Successfully tagged universalmessaging:1
 
 The instructions in the Dockerfile create an image containing the minimal
 contents from your installation that are necessary to run the Universal Messaging server
-and tool. The image is also set up to allow trouble-free execution; suitable environment
+and command line tools. The image is also set up to allow trouble-free execution; suitable environment
 variables and defaults are set. You can see this in more detail by reading the
 'Dockerfile', 'configure.sh' and 'umstart.sh' scripts, and the embedded commentary in both.
 
@@ -62,22 +65,16 @@ You can see that an image has been created as follows:
 	docker images 
 
     REPOSITORY                  TAG      IMAGE ID        CREATED            VIRTUAL SIZE
-    universalmessaging-server   10.x     5b733a9b987d    39 seconds ago     415 MB
+    universalmessaging-server   1     	 5b733a9b987d    39 seconds ago     415 MB
 
 But at this point it is just an image, the Docker equivalent of a VM template,
 not a running process. 
-
-By default, the Dockerfile will look for the '**umserver**' Universal Messaging realm server instance in the host installation to copy;
-you can build the image from a different instance by providing the "**__instance_name**" 
-build argument.
-
-	docker build --build-arg __instance_name=testserver --tag universalmessaging-server:10.x
 
 Running a Docker image
 ======================
 You can turn your new image into a running container with the '*docker run*'
 command. By default, the container will be running a realm server and inside
-the container we will have runUMTool configured for admin use.
+the container we will have command line tools configured for admin use.
 
 As a virtualization platform, Docker runs each container in its own isolated
 network stack. Any exposure to the host operating system's network stack, or
@@ -90,14 +87,14 @@ port of the Universal Messaging Image.
 
 Turning your new image into a running container will look something like this:
 
-	docker run -d -p 9010:9000 --name umcontainer universalmessaging-server:10.x
+	docker run -d -p 9010:9000 --name umcontainer universalmessaging-server:1
 
 You can then look for your running container:
 
 	docker ps
 
     CONTAINER ID   IMAGE                            COMMAND                    CREATED            STATUS             PORTS                    NAMES
-    a15557bccc7c   universalmessaging-server:10.x   "/bin/sh -c umstart.…"     6 seconds ago      Up 5 seconds       0.0.0.0:9010->9000/tcp   umcontainer
+    a15557bccc7c   universalmessaging-server:1   "/bin/sh -c umstart.…"     6 seconds ago      Up 5 seconds       0.0.0.0:9010->9000/tcp   umcontainer
 
 The 'umstart.sh' script is a wrapper script specific to this packaging kit, and it
 is used for orchestrating the startup and shutdown of the realm server in
@@ -106,17 +103,19 @@ Docker containers.
 You can change the runtime configuration of the realm server container during the run,
 by providing environment variables. The optional configurations which you can pass are:
 	
-* Realm name
-* Java initial memory size
-* Java maximum memory size
-* Max direct memory size
-* Basic auth enable
-* Basic auth mandatory
+* **REALM_NAME**            :   Name of the Universal Messaging Realm. 
+* **INIT_JAVA_MEM_SIZE**    :   Initial Java Heap Size (in MB)
+* **MAX_JAVA_MEM_SIZE**     :   Maximum Java Heap Size (in MB)
+* **MAX_DIRECT_MEM_SIZE**   :   Maximum Direct Memory Size (in GB)
+* **BASIC_AUTH_ENABLE**     :   Enable the Basic auth on server
+* **BASIC_AUTH_MANDATORY**  :   Enabel and Mandate the Basic auth on server
+
+Note: Default value for all the above runtime parameters is whatever present in the Server_Common.conf of that particular Universal Messaging instance in the installation. 
 	
 You can pass the configurations as follows:
 
 	docker run -e REALM_NAME=umtest -e INIT_JAVA_MEM_SIZE=2048 -e MAX_JAVA_MEM_SIZE=2048
-	-e MAX_DIRECT_MEM_SIZE=3G -e BASIC_AUTH_ENABLE=Y -e BASIC_AUTH_MANDATORY=Y -p 9020:9000 --name umcontainer universalmessaging-server:10.x
+	-e MAX_DIRECT_MEM_SIZE=3G -e BASIC_AUTH_ENABLE=Y -e BASIC_AUTH_MANDATORY=Y -p 9020:9000 --name umcontainer universalmessaging-server:1
 
 Interacting with the container
 ==============================
@@ -135,7 +134,7 @@ configuration and state changes you made previously have persisted.
 
 Using runUMTool.sh, you can create/update/get/delete assets on the UM realm server.
 You can use the runUMTool from the running container by using 'docker exec',
-without getting into the container. [link to usage of runUMTool documentation!](https://documentation.softwareag.com/onlinehelp/Rohan/num10-3/10-3_UM_webhelp/index.html#page/um-webhelp%2Fto-header_clu_syntax_reference.html%23)
+without getting into the container. [link to usage of runUMTool documentation](https://documentation.softwareag.com/onlinehelp/Rohan/num10-3/10-3_UM_webhelp/index.html#page/um-webhelp%2Fto-header_clu_syntax_reference.html%23)
 
 	docker exec umcontainer runUMTool.sh ListChannels -rname=nsp://localhost:9000
 
@@ -178,6 +177,14 @@ You can use the following command to check how many volumes are created.
 By default, the folders related to the volumes will be saved under the '*/var/lib/docker/volumes*' folder in
 the Docker host machine. 
 
+Licence
+=======
+By default the licence which is present in the installation get's copied to the image. And that will be used.
+So before building the image you can keep the valid licence in the installation, so that it get's copied and used.
+
+If you want to update the licence file in the image, then as we are storing the licence file using docker volumes concept.
+You can replace the licence file in that licence directory, so that latest licence file get's used when the new container started.
+
 Docker-compose (to run multiple docker container)
 =================================================
 The Docker Compose tool, 'docker-compose' automates the creation,
@@ -199,7 +206,7 @@ You can configure the image name which you have build using the '*docker build*'
 	version:"3.2"
 	services:
 	  node:
-		image:universalmessaging-server:10.x
+		image:universalmessaging-server:1
 
 If you want to build the image using docker file by passing build time arguments. You can configure them as follows:
 
@@ -210,16 +217,14 @@ If you want to build the image using docker file by passing build time arguments
 		  context: .
 		  dockerfile: Dockerfile-alternate
           args:
-			- BASE_IMAGE=centos
-        	- TAG=7
-			- __instance_name=umserver
+			__instance_name: testserver
 
 You can configure container name and exposed and mapped ports as well. 
 
 	version:"3.2"
 	services:
 	  node:
-		image:universalmessaging-server:10.x
+		image:universalmessaging-server:1
 		container_name: umcontainer
 		ports:    
 		 - "9010:9000"
@@ -235,4 +240,4 @@ You can configure the runtime parameters which you would like to pass to contain
      - REALM_NAME=umcontainer    
 
 You can find sample docker-compose.yml file along with Dockerfile and other scripts. 
-For more configuration changes, please go through [docker compose documentation!](https://docs.docker.com/compose/)
+For more configuration changes, please go through [docker compose documentation](https://docs.docker.com/compose/)
