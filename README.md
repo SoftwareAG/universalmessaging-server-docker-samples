@@ -179,11 +179,10 @@ the Docker host machine.
 
 Licence
 =======
-By default the licence which is present in the installation get's copied to the image. And that will be used.
-So before building the image you can keep the valid licence in the installation, so that it get's copied and used.
+By default the license which is configured in the instance get's copied to the image and used.
 
-If you want to update the licence file in the image, then as we are storing the licence file using docker volumes concept.
-You can replace the licence file in that licence directory, so that latest licence file get's used when the new container started.
+If you want to update the license file during container run, then copy the valid license to license volume
+and start the container.
 
 Docker-compose (to run multiple docker container)
 =================================================
