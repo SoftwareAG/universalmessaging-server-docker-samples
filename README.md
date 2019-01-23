@@ -1,6 +1,6 @@
 # Universal Messaging samples for Docker
 
- Copyright (c) 1999 - 2011 my-Channels Ltd
+ Copyright (c) 1999 - 2011 my-Channels Ltd  
  Copyright (c) 2012 - 2019 Software AG, Darmstadt, Germany and/or its licensors
 
  SPDX-License-Identifier: Apache-2.0
