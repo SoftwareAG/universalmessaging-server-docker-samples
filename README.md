@@ -27,9 +27,11 @@ Prerequisites
 This package makes the following assumptions:
 
 * You have some familiarity with the Docker technology.
-* You have Universal Messaging 10.3 or above installed on a 64-bit Linux machine using the Software AG installer.
+* You have Universal Messaging 10.3 or above installed on a 64-bit Linux machine using 
+the Software AG installer.
+* All the latest available fixes installed for Universal Messaging Server and Template applications.
 * A Universal Messaging realm server instance has been created.
-* Docker Docker 17.09.1-ce or later is installed and its daemon is running 
+* Docker 17.09.1-ce or later is installed and its daemon is running 
 [link to docker install documentation](https://docs.docker.com/installation/#installation).
 * Docker Compose 1.22.0 or later is installed
 [link to docker compose install documentation](https://docs.docker.com/compose/install/).
@@ -37,11 +39,12 @@ This package makes the following assumptions:
 
 Building a Docker image
 =======================
-The file `Dockerfile` is a Dockerfile that can be used to turn your
+The file '**Dockerfile**' is a Dockerfile that can be used to turn your
 Universal Messaging installation into a Docker image, which can then be used
 to run the realm server as well as run the command line tools as a client on the running server.
 
-!!!The '**Dockerfile**', '**configure.sh**' and '**umstart.sh**' files should be copied into the root of your Software AG installation
+!!!The '**Dockerfile**', '**configure.sh**' and '**umstart.sh**' files should be copied into 
+the root of your Software AG installation
 !!!(e.g. '/opt/softwareag/'). 
 
 From that directory, Docker can be asked to build
@@ -49,7 +52,8 @@ the image using instructions from the Dockerfile:
 
 	docker build --build-arg __instance_name=testserver --tag universalmessaging-server:1 .
 	
-**__instance_name**: This Specific instance content copied to the image. Default instance name is 'umserver'. If you want to copy different instance content,
+**__instance_name**: This specific instance content will be copied to the image. The default 
+instance name is 'umserver'. If you want to copy different instance content,
 specify the instance name here.
 
 Docker will output its progress, and after a minute or so will exit with a
@@ -60,9 +64,10 @@ message like:
 
 The instructions in the Dockerfile create an image containing the minimal
 contents from your installation that are necessary to run the Universal Messaging server
-and command line tools. The image is also set up to allow trouble-free execution; suitable environment
-variables and defaults are set. You can see this in more detail by reading the
-'Dockerfile', 'configure.sh' and 'umstart.sh' scripts, and the embedded commentary in both.
+and command line tools. The image is also set up to allow trouble-free execution; 
+suitable environment variables and defaults are set. You can see this in more detail by reading 
+the '**Dockerfile**', '**configure.sh**' and '**umstart.sh**' scripts, 
+and the embedded commentary in both.
 
 You can see that an image has been created as follows:
 
@@ -87,7 +92,7 @@ maps a listening port in the container to a listening port on the host
 networking stack (*-p MappedPort:ExposedPort*). 
 
 For this image you will probably want to map port '9000', the default NHP/NSP 
-port of the Universal Messaging Image. 
+port of the Universal Messaging image. 
 
 Turning your new image into a running container will look something like this:
 
@@ -111,19 +116,21 @@ by providing environment variables. The optional configurations which you can pa
 * **INIT_JAVA_MEM_SIZE**    :   Initial Java Heap Size (in MB)
 * **MAX_JAVA_MEM_SIZE**     :   Maximum Java Heap Size (in MB)
 * **MAX_DIRECT_MEM_SIZE**   :   Maximum Direct Memory Size (in GB)
-* **BASIC_AUTH_ENABLE**     :   Enable the Basic auth on server
-* **BASIC_AUTH_MANDATORY**  :   Enabel and Mandate the Basic auth on server
+* **BASIC_AUTH_ENABLE**     :   Enable the Basic authentication on the server
+* **BASIC_AUTH_MANDATORY**  :   Enable and Mandate the Basic authentication on the server
 
-Note: Default value for all the above runtime parameters is whatever present in the Server_Common.conf of that particular Universal Messaging instance in the installation. 
+Note: The default value for all the above runtime parameters is whatever is present in the 
+Server_Common.conf file of that particular Universal Messaging instance in the installation. 
 	
 You can pass the configurations as follows:
 
 	docker run -e REALM_NAME=umtest -e INIT_JAVA_MEM_SIZE=2048 -e MAX_JAVA_MEM_SIZE=2048
-	-e MAX_DIRECT_MEM_SIZE=3G -e BASIC_AUTH_ENABLE=Y -e BASIC_AUTH_MANDATORY=Y -p 9020:9000 --name umcontainer universalmessaging-server:1
+	-e MAX_DIRECT_MEM_SIZE=3G -e BASIC_AUTH_ENABLE=Y -e BASIC_AUTH_MANDATORY=Y -p 9020:9000 
+	--name umcontainer universalmessaging-server:1
 
 Interacting with the container
 ==============================
-You can able to connect to the Universal Messaging relam server using mapped port.
+You can connect to the Universal Messaging realm server using a mapped port.
 
 You can then stop the realm server by bringing down its container:
 
@@ -138,9 +145,17 @@ configuration and state changes you made previously have persisted.
 
 Using runUMTool.sh, you can create/update/get/delete assets on the UM realm server.
 You can use the runUMTool from the running container by using 'docker exec',
-without getting into the container. [link to usage of runUMTool documentation](https://documentation.softwareag.com/onlinehelp/Rohan/num10-3/10-3_UM_webhelp/index.html#page/um-webhelp%2Fto-header_clu_syntax_reference.html%23)
+without getting into the container. [link to usage of runUMTool documentation]
+(https://documentation.softwareag.com/onlinehelp/Rohan/num10-3/10-3_UM_webhelp/index.html#page/um-webhelp%2Fto-header_clu_syntax_reference.html%23)
 
 	docker exec umcontainer runUMTool.sh ListChannels -rname=nsp://localhost:9000
+	
+Note:
+
+Using runUMTool.sh, the RealmInformationCollector tool can't collect the information related to 
+the instance manager as the instance manager component is not present in the image. So when you are 
+using this RealmInformationCollector tool to collect the information related to the realm server, 
+use the option "-exclude=instancemgr" to avoid errors related to the instance manager.
 
 Log files
 =========
@@ -178,15 +193,15 @@ You can use the following command to check how many volumes are created.
 
 	docker volume ls
 	
-By default, the folders related to the volumes will be saved under the '*/var/lib/docker/volumes*' folder in
-the Docker host machine. 
+By default, the folders related to the volumes will be saved under the '*/var/lib/docker/volumes*' 
+folder in the Docker host machine. 
 
 Licence
 =======
-By default the license which is configured in the instance get's copied to the image and used.
+By default the license which is configured in the instance gets copied to the image and used.
 
-If you want to update the license file during container run, then copy the valid license to license volume
-and start the container.
+If you want to update the license file during the container run, then copy the valid license 
+to the license volume and start the container.
 
 Docker-compose (to run multiple docker container)
 =================================================
@@ -194,9 +209,11 @@ The Docker Compose tool, 'docker-compose' automates the creation,
 deployment and interaction of multiple Docker
 containers from a configuration file, typically 'docker-compose.yml'.
 
-You need to copy the sample docker-compose i.e., '**docker-compose.yml**' file into the root of your Software AG installation.
+You need to copy the sample docker-compose i.e., '**docker-compose.yml**' file into the root of 
+your Software AG installation.
 
-The Docker-compose 'up' command will create the container from the configurations and run the container.
+The Docker-compose 'up' command will create the container from the configurations and run the 
+container.
 
 	docker-compose up
 	
@@ -204,14 +221,16 @@ To stop the container, you can use the following command:
 
 	docker-compose down
 
-You can configure the image name which you have build using the '*docker build*' commands mentioned above in the docker-compose.
+You can configure the image name which you have build using the '*docker build*' commands 
+mentioned above in the docker-compose.
 
 	version:"3.2"
 	services:
 	  node:
 		image:universalmessaging-server:1
 
-If you want to build the image using docker file by passing build time arguments. You can configure them as follows:
+If you want to build the image using the docker file by passing build time arguments, 
+you can configure them as follows:
 
 	version:"3.2"
 	services:
@@ -222,7 +241,7 @@ If you want to build the image using docker file by passing build time arguments
           args:
 			__instance_name: testserver
 
-You can configure container name and exposed and mapped ports as well. 
+You can configure the container name and exposed and mapped ports as well. 
 
 	version:"3.2"
 	services:
@@ -237,15 +256,11 @@ You can configure the named volumes for the directories which you would like sto
 	volumes:
      - um_data:/opt/softwareag/UniversalMessaging/server/umserver/data
 	 
-You can configure the runtime parameters which you would like to pass to container at runtime.
+You can configure the runtime parameters which you would like to pass to the container at runtime.
 
 	environment:
      - REALM_NAME=umcontainer    
 
-You can find sample docker-compose.yml file along with Dockerfile and other scripts. 
-For more configuration changes, please go through [docker compose documentation](https://docs.docker.com/compose/)
-
-______________________
-These tools are provided as-is and without warranty or support. They do not constitute part of the Software AG product suite. Users are free to use, fork and modify them, subject to the license agreement. While Software AG welcomes contributions, we cannot guarantee to include every contribution in the master project.	
-
-Contact us at [TECHcommunity](mailto:technologycommunity@softwareag.com?subject=Github/SoftwareAG) if you have any questions.
+You can find a sample docker-compose.yml file in the same location as the Dockerfile and 
+other scripts. For more configuration changes, please go through 
+[docker compose documentation](https://docs.docker.com/compose/)
