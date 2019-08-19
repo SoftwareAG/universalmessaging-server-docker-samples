@@ -22,7 +22,6 @@ common/bin/protoc
 common/bin/wrapper-3.5.29
 
 common/lib/diagnostic-tool
-common/lib/ext
 common/lib/glassfish
 common/lib/migrate
 common/lib/tw-3.5.29
