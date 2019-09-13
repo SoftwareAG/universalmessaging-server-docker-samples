@@ -264,3 +264,7 @@ You can configure the runtime parameters which you would like to pass to the con
 You can find a sample docker-compose.yml file in the same location as the Dockerfile and 
 other scripts. For more configuration changes, please go through 
 [docker compose documentation](https://docs.docker.com/compose/)
+______________________
+These tools are provided as-is and without warranty or support. They do not constitute part of the Software AG product suite. Users are free to use, fork and modify them, subject to the license agreement. While Software AG welcomes contributions, we cannot guarantee to include every contribution in the master project.	
+
+Contact us at [TECHcommunity](mailto:technologycommunity@softwareag.com?subject=Github/SoftwareAG) if you have any questions.
