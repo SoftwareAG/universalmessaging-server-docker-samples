@@ -25,8 +25,6 @@ cd $UM_HOME/server/$INSTANCE_NAME/bin
 
 sed -i "s|\(set.HEAP_DUMP_DIR\)=\(.*\)|\1=../data/heap_dumps|" $SERVER_COMMON_CONF_FILE
 sed -i "s|\(wrapper.java.command\)=\(.*\)|\1=$SAG_HOME/jvm/jvm/bin/java|" $SERVER_COMMON_CONF_FILE
-sed -i "s|\(wrapper.java.library.path.1\)=\(.*\)|\1=$SAG_HOME/common/lib/tw-3.5.32|" $SERVER_COMMON_CONF_FILE
-sed -i "s|\(wrapper.java.classpath.12\)=\(.*\)|\1=$SAG_HOME/common/lib/tw-3.5.32/wrapper.jar|" $SERVER_COMMON_CONF_FILE
 sed -i "s|\(.*\="\""-DSERVERDIR\)=\(.*\)|\1=$UM_HOME/server/$INSTANCE_NAME"\""|" $SERVER_COMMON_CONF_FILE
 sed -i "s|\(.*\="\""-Djavax.net.ssl.trustStore\)=\(.*\)|\1=$UM_HOME/server/$INSTANCE_NAME/bin/nirvanacacerts.jks"\""|" $SERVER_COMMON_CONF_FILE
 sed -i "s|\(.*\="\""-Djavax.net.ssl.keyStore\)=\(.*\)|\1=$UM_HOME/server/$INSTANCE_NAME/bin/server.jks"\""|" $SERVER_COMMON_CONF_FILE
@@ -34,8 +32,6 @@ sed -i "s|\(#include \)\(.*\)|\1$UM_HOME/server/$INSTANCE_NAME/bin/Custom_Server
 
 sed -i "s|\(SERVER_DAEMON_PATH\)=\(.*\)|\1="\""$UM_HOME/server/$INSTANCE_NAME/bin"\""|" nserver
 sed -i "s|\(DAEMON_SH_CMD\)=\(.*\)|\1="\""$SAG_HOME/common/bin/daemon.sh"\""|" nserver
-
-sed -i "s|\(WRAPPER_CMD\)=\(.*\)|\1="\""$SAG_HOME/common/bin/wrapper-3.5.32"\""|" nserverdaemon
 
 sed -i "s|\(wrapper.working.dir\)=\(.*\)|\1=$UM_HOME/server/$INSTANCE_NAME/bin/|" nserverdaemon.conf
 sed -i "s|\(#include \).*\(nserverdaemon-licence.conf\)|\1$UM_HOME/server/$INSTANCE_NAME/bin/\2|" nserverdaemon.conf
