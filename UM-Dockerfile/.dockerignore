@@ -18,17 +18,16 @@
 #################################################################################
 # It will exclude the files and directories mentioned below from the context(Software AG root) directory. It increase build's performance.
 
+common/lib/**
 common/bin/protoc
-
-common/lib/diagnostic-tool
-common/lib/ext
-common/lib/glassfish
-common/lib/migrate
-common/lib/n*.jar
-common/lib/spm-metering-validator.jar
-common/lib/u*.jar
-common/lib/wm*.jar
 
 profiles
 
 UniversalMessaging/lib/soap
+
+
+#following files will not be considered for exclusion, these files will be kept in the image
+!common/lib/saglic.jar
+!common/lib/jacocoagent.jar
+!common/lib/tw-*
+!common/lib/ext/log4j
