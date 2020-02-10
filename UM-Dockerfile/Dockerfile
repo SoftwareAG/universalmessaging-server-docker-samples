@@ -63,6 +63,7 @@ COPY --chown=1724:1724 ./common/lib/ $SAG_HOME/common/lib/
 COPY --chown=1724:1724 ./common/conf/users.txt $USERS_DIR/users.txt
 COPY --chown=1724:1724 ./UniversalMessaging/server/$INSTANCE_NAME/bin $UM_HOME/server/$INSTANCE_NAME/bin
 COPY --chown=1724:1724 ./UniversalMessaging/lib/ $UM_HOME/lib/
+COPY --chown=1724:1724 ./UniversalMessaging/classes/ $UM_HOME/classes/
 COPY --chown=1724:1724 ./UniversalMessaging/tools/runner/ $TOOLS_DIR/runner/
 
 # Copy the entry point script
