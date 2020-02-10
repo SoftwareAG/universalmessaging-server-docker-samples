@@ -19,13 +19,11 @@
 # It will exclude the files and directories mentioned below from the context(Software AG root) directory. It increase build's performance.
 
 common/bin/protoc
-common/bin/wrapper-3.5.29
 
 common/lib/diagnostic-tool
 common/lib/ext
 common/lib/glassfish
 common/lib/migrate
-common/lib/tw-3.5.29
 common/lib/n*.jar
 common/lib/spm-metering-validator.jar
 common/lib/u*.jar
