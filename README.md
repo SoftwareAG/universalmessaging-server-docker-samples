@@ -47,20 +47,22 @@ to run the realm server as well as run the command line tools as a client on the
 the root of your Software AG installation
 !!!(e.g. '/opt/softwareag/'). 
 
-From that directory, Docker can be asked to build
-the image using instructions from the Dockerfile:
+From that directory, Docker can be asked to build the image using instructions from the Dockerfile:
 
-	docker build --build-arg __instance_name=testserver --tag universalmessaging-server:1 .
+	docker build --tag  universalmessaging-server:1 .
 	
-**__instance_name**: This specific instance content will be copied to the image. The default 
-instance name is 'umserver'. If you want to copy different instance content,
-specify the instance name here.
-
 Docker will output its progress, and after a minute or so will exit with a
 message like:
 
 	Successfully built 5b733a9b987d
 	Successfully tagged universalmessaging:1
+
+You can also specify the instance name to build image from your own instance.
+	
+	docker build --build-arg __instance_name=testserver --tag universalmessaging-server:1 .
+	
+**__instance_name**: This specific instance content will be copied to the image. The default 
+instance name is 'umserver'. 
 
 The instructions in the Dockerfile create an image containing the minimal
 contents from your installation that are necessary to run the Universal Messaging server
@@ -76,8 +78,6 @@ You can see that an image has been created as follows:
     REPOSITORY                  TAG      IMAGE ID        CREATED            VIRTUAL SIZE
     universalmessaging-server   1     	 5b733a9b987d    39 seconds ago     415 MB
 
-But at this point it is just an image, the Docker equivalent of a VM template,
-not a running process. 
 
 Running a Docker image
 ======================
@@ -150,13 +150,6 @@ without getting into the container. [link to usage of runUMTool documentation]
 
 	docker exec umcontainer runUMTool.sh ListChannels -rname=nsp://localhost:9000
 	
-Note:
-
-Using runUMTool.sh, the RealmInformationCollector tool can't collect the information related to 
-the instance manager as the instance manager component is not present in the image. So when you are 
-using this RealmInformationCollector tool to collect the information related to the realm server, 
-use the option "-exclude=instancemgr" to avoid errors related to the instance manager.
-
 Log files
 =========
 Docker treats anything emitted on the console by a contained process as
