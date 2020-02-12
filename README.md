@@ -27,7 +27,7 @@ Prerequisites
 This package makes the following assumptions:
 
 * You have some familiarity with the Docker technology.
-* You have Universal Messaging 10.3 or above installed on a 64-bit Linux machine using 
+* You have Universal Messaging 10.3 installed on a 64-bit Linux machine using 
 the Software AG installer.
 * All the latest available fixes installed for Universal Messaging Server and Template applications.
 * A Universal Messaging realm server instance has been created.
