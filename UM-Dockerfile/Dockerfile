@@ -93,6 +93,6 @@ VOLUME [ "$DATA_DIR", "$LOG_DIR", "$LIC_DIR", "$USERS_DIR" ]
 WORKDIR $SAG_HOME
 ENTRYPOINT umstart.sh
 
-HEALTHCHECK --interval=120s --timeout=60s --start-period=120s  CMD $UM_HOME/tools/runner/runUMTool.sh GetServerTime -rname=nsp://localhost:$PORT || exit 1
+HEALTHCHECK --interval=15s --timeout=30s --start-period=120s  CMD $UM_HOME/tools/runner/runUMTool.sh GetServerTime -rname=nsp://localhost:$PORT || exit 1
 
 EXPOSE $PORT
