@@ -131,7 +131,7 @@ rather than a directory with random name.
 
 use the following command to map the directories to custom volumes
 
-	docker run -d -v datadir:/opt/softwareag/UniversalMessaging/server/umserver/data -v logdir:/opt/softwareag/UniversalMessaging/server/umserver/logs -v licdir:/opt/softwareag/UniversalMessaging/server/umserver/licence -v userdir:/opt/softwareag/common/conf -p 9001:9000 --name umcontainer_one store/softwareag/universalmessaging-server:10.5
+	docker run -d -v datadir:/opt/softwareag/UniversalMessaging/server/umserver/data -v logdir:/opt/softwareag/UniversalMessaging/server/umserver/logs -v licdir:/opt/softwareag/UniversalMessaging/server/umserver/licence -v userdir:/opt/softwareag/common/conf -p 9001:9000 --name umcontainer_one um-image:1
 
 this will create datadir, logdir,licdir, userdir under '*/var/lib/docker/volumes' directory.
 this can be further customised by providing absolute path of the directory. these 
