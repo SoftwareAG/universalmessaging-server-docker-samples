@@ -170,7 +170,7 @@ should be used to connect to the server
 
 runUMTool available inside the server container can also be used for administrative purpose.
  [link to usage of runUMTool documentation]
-(https://documentation.softwareag.com/onlinehelp/Rohan/num10-3/10-3_UM_webhelp/index.html#page/um-webhelp%2Fto-header_clu_syntax_reference.html%23)
+(https://documentation.softwareag.com/onlinehelp/Rohan/num10-5/10-5_UM_webhelp/index.html#page/um-webhelp%2Fto-header_clu_syntax_reference.html)
 
 to run runUMTool tool available inside the container. 
 
