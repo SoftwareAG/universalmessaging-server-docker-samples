@@ -31,7 +31,7 @@ This package makes the following assumptions:
 the Software AG installer.
 * All the latest available fixes installed for Universal Messaging Server and Template applications.
 * A Universal Messaging realm server instance has been created.
-* Docker 17.09.1-ce or later is installed and its daemon is running 
+* Docker 18.06.1-ce or later is installed and its daemon is running 
 [link to docker install documentation](https://docs.docker.com/installation/#installation).
 * Docker Compose 1.22.0 or later is installed
 [link to docker compose install documentation](https://docs.docker.com/compose/install/).
@@ -39,42 +39,34 @@ the Software AG installer.
 
 Building a Docker image
 =======================
-The file '**Dockerfile**' is a Dockerfile that can be used to turn your
-Universal Messaging installation into a Docker image, which can then be used
-to run the realm server as well as run the command line tools as a client on the running server.
-
 !!!The '**Dockerfile**', '**configure.sh**' and '**umstart.sh**' files should be copied into 
-the root of your Software AG installation
-!!!(e.g. '/opt/softwareag/'). 
+the root of your Software AG installation. these files helps to build Universal Messaging image 
+from the installation
+!!!(e.g. '/opt/softwareag/').
 
-From that directory, Docker can be asked to build
-the image using instructions from the Dockerfile:
+Note : Sample commands below assumes the installation to contain default Universal Messaging 
+server instance 'umserver' in /opt/softwareag/UniversalMessaging/server directory. 
 
-	docker build --build-arg __instance_name=testserver --tag universalmessaging-server:1 .
-	
-**__instance_name**: This specific instance content will be copied to the image. The default 
-instance name is 'umserver'. If you want to copy different instance content,
-specify the instance name here.
+From that directory, use the below commands to build the image:
 
+	docker build  --tag um-image:1 .
+       
+    
+**__instance_name** argument can be used as docker build argument to create a docker image out 
+of a specific Universal Messaging server instance. 
+(eg: docker build  --build-arg __instance_name=um105 --tag um-image:1 .)
 Docker will output its progress, and after a minute or so will exit with a
 message like:
 
 	Successfully built 5b733a9b987d
-	Successfully tagged universalmessaging:1
-
-The instructions in the Dockerfile create an image containing the minimal
-contents from your installation that are necessary to run the Universal Messaging server
-and command line tools. The image is also set up to allow trouble-free execution; 
-suitable environment variables and defaults are set. You can see this in more detail by reading 
-the '**Dockerfile**', '**configure.sh**' and '**umstart.sh**' scripts, 
-and the embedded commentary in both.
+	Successfully tagged um-image:1
 
 You can see that an image has been created as follows:
 
 	docker images 
 
     REPOSITORY                  TAG      IMAGE ID        CREATED            VIRTUAL SIZE
-    universalmessaging-server   1     	 5b733a9b987d    39 seconds ago     415 MB
+    um-image                    1     	 5b733a9b987d    39 seconds ago     415 MB
 
 But at this point it is just an image, the Docker equivalent of a VM template,
 not a running process. 
@@ -82,35 +74,122 @@ not a running process.
 Running a Docker image
 ======================
 You can turn your new image into a running container with the '*docker run*'
-command. By default, the container will be running a realm server and inside
-the container we will have command line tools configured for admin use.
-
-As a virtualization platform, Docker runs each container in its own isolated
-network stack. Any exposure to the host operating system's network stack, or
-to that of other containers, must be explicit. The '*-p*' option to '*docker run*'
-maps a listening port in the container to a listening port on the host
-networking stack (*-p MappedPort:ExposedPort*). 
-
-For this image you will probably want to map port '9000', the default NHP/NSP 
-port of the Universal Messaging image. 
+command. Container port 9000 (default umserver port) should be mapped to one of the host 
+port to access the server from outside world. 
 
 Turning your new image into a running container will look something like this:
 
-	docker run -d -p 9010:9000 --name umcontainer universalmessaging-server:1
+	docker run -d -p 9555:9000 --name umcontainer um-image:1
 
 You can then look for your running container:
 
 	docker ps
 
     CONTAINER ID   IMAGE                            COMMAND                    CREATED            STATUS             PORTS                    NAMES
-    a15557bccc7c   universalmessaging-server:1   "/bin/sh -c umstart.…"     6 seconds ago      Up 5 seconds       0.0.0.0:9010->9000/tcp   umcontainer
+    a15557bccc7c   um-image:1                       "/bin/sh -c umstart.…"     6 seconds ago      Up 5 seconds       0.0.0.0:9555->9000/tcp   umcontainer
 
-The 'umstart.sh' script is a wrapper script specific to this packaging kit, and it
-is used for orchestrating the startup and shutdown of the realm server in
-Docker containers.
+Log files
+=========
+Output of the two log files (*nirvana.log* and *UMRealmservice.log*)  are streamed to 
+the console output. logs can also be viewed by  running '*docker logs <containerName>*'. 
 
-You can change the runtime configuration of the realm server container during the run,
-by providing environment variables. The optional configurations which you can pass are:
+	docker logs umcontainer
+
+To differentiate the logs, we have prefixed each log entry with its log file name. 
+It will be similar to the following:
+
+	[UMRealmService.log]: INFO   | jvm 1    | 2018/08/06 11:52:21 | Operating System Environment :
+	[nirvana.log]: [Mon Aug 06 14:19:42.707 UTC 2018] Operating System Environment :
+
+Persistence (docker volumes)
+============================
+It is important for a message layer to store the states and assets, otherwise the 
+data will be lost once the container is gone.In Universal messaging we persist 
+the following directories.
+	
+* UM server data directory    - <installationDir>/UniversalMessaging/server/umserver/data 
+                                directory contains all the Universal Messaging assets 
+                                (channels, queues etc) and its state, hence it is important 
+                                to persist the data directory to volumes.
+* UM server logs directory    - <installationDir>/UniversalMessaging/server/umserver/logs  
+                                is persisted to help diagnose issues.
+* UM server licence directory - <installationDir>/UniversalMessaging/server/umserver/license 
+                                directory needs to be persisted in order to update the 
+                                license file seamlessly.
+* UM server users  directory  - <installationDir>/common/conf directory is persisted on the 
+                                volume, this allows user to add and delete users for 
+                                Universal Messaging. 
+
+You can use the following command to check how many volumes are created.
+
+	docker volume ls
+	
+Unless user specifies the volume mapping, the folders related to the volumes will be 
+saved under the '*/var/lib/docker/volumes*' directory and the directory names are 
+random IDs. It is better to map the above listed directories to custom directories 
+rather than a directory with random name. 
+
+use the following command to map the directories to custom volumes
+
+	docker run -d -v datadir:/opt/softwareag/UniversalMessaging/server/umserver/data -v logdir:/opt/softwareag/UniversalMessaging/server/umserver/logs -v licdir:/opt/softwareag/UniversalMessaging/server/umserver/licence -v userdir:/opt/softwareag/common/conf -p 9001:9000 --name umcontainer_one um-image:1
+
+this will create datadir, logdir,licdir, userdir under '*/var/lib/docker/volumes' directory.
+this can be further customised by providing absolute path of the directory. these 
+directories are persisted on the volumes and data can be retrieved even if the container 
+is down.
+ 
+restart the container to verify if the volumes are persisted.
+
+	docker stop umcontainer
+	docker start umcontainer
+
+If you reconnect from a Universal Messaging client you will see that all of the
+configuration and state changes you made previously are still available.
+
+
+Licence
+=======
+By default the license which is configured in the instance gets copied to the image 
+and used. In case user want to update the license file for a container, stop the 
+container and copy the new license file to mapped license file directory on volumes 
+and then restart the container.
+
+
+Docker-compose (to run multiple docker container)
+=================================================
+Universal Messaging server image supports the use of docker compose.
+You can find a sample docker-compose.yml file in the same location as the Dockerfile 
+and other scripts. For more configuration changes, please go through 
+[docker compose documentation](https://docs.docker.com/compose/)
+
+Administrating  Universal Messaging running in a container
+=========================================================
+User can administrator Universal Messaging server running on a container by using any of the 
+administration tools (Eg: Enterprise Manager, runUMTool etc). Mapped host machine port 
+should be used to connect to the server
+
+runUMTool available inside the server container can also be used for administrative purpose.
+ [link to usage of runUMTool documentation]
+(https://documentation.softwareag.com/onlinehelp/Rohan/num10-3/10-3_UM_webhelp/index.html#page/um-webhelp%2Fto-header_clu_syntax_reference.html%23)
+
+to run runUMTool tool available inside the container. 
+
+	docker exec umcontainer runUMTool.sh ListChannels -rname=nsp://localhost:9000
+	
+Note:
+
+Using runUMTool.sh, the RealmInformationCollector tool can't collect the information related 
+to the instance manager as the instance manager component is not present in the image. 
+So when you are using this RealmInformationCollector tool to collect the information related 
+to the realm server, use the option "-exclude=instancemgr" to avoid errors related to the 
+instance manager.
+
+Environment variables 
+======================
+
+Following environment variables can be set for realm server container during container 
+creation, by providing environment variables. The optional configurations which you can 
+pass are:
 	
 * **REALM_NAME**            :   Name of the Universal Messaging Realm. 
 * **INIT_JAVA_MEM_SIZE**    :   Initial Java Heap Size (in MB)
@@ -126,145 +205,9 @@ You can pass the configurations as follows:
 
 	docker run -e REALM_NAME=umtest -e INIT_JAVA_MEM_SIZE=2048 -e MAX_JAVA_MEM_SIZE=2048
 	-e MAX_DIRECT_MEM_SIZE=3G -e BASIC_AUTH_ENABLE=Y -e BASIC_AUTH_MANDATORY=Y -p 9020:9000 
-	--name umcontainer universalmessaging-server:1
+	--name umcontainer um-image:1
 
-Interacting with the container
-==============================
-You can connect to the Universal Messaging realm server using a mapped port.
-
-You can then stop the realm server by bringing down its container:
-
-	docker stop umcontainer
-
-And restart it as follows:
-
-	docker start umcontainer
-
-If you reconnect from a Universal Messaging client you will see that all of the
-configuration and state changes you made previously have persisted.
-
-Using runUMTool.sh, you can create/update/get/delete assets on the UM realm server.
-You can use the runUMTool from the running container by using 'docker exec',
-without getting into the container. [link to usage of runUMTool documentation]
-(https://documentation.softwareag.com/onlinehelp/Rohan/num10-3/10-3_UM_webhelp/index.html#page/um-webhelp%2Fto-header_clu_syntax_reference.html%23)
-
-	docker exec umcontainer runUMTool.sh ListChannels -rname=nsp://localhost:9000
-	
-Note:
-
-Using runUMTool.sh, the RealmInformationCollector tool can't collect the information related to 
-the instance manager as the instance manager component is not present in the image. So when you are 
-using this RealmInformationCollector tool to collect the information related to the realm server, 
-use the option "-exclude=instancemgr" to avoid errors related to the instance manager.
-
-Log files
-=========
-Docker treats anything emitted on the console by a contained process as
-logging, and stores it appropriately. The Docker packaging of Universal
-Messaging ensures that all logging is sent to the console. Try
-
-	docker logs umcontainer
-
-to see the log messages announcing the startup of the realm server, and the
-connection of remote clients.
-
-You can see the output of the two log files (*nirvana.log* and *UMRealmservice.log*) on the console.
-The output of both logs is streamed to the console output. 
-You can also view them using '*docker logs <containerName>*' as mentioned above. 
-
-To differentiate the logs, we have prefixed each log entry with its log file name. 
-It will be similar to the following:
-
-	[UMRealmService.log]: INFO   | jvm 1    | 2018/08/06 11:52:21 | Operating System Environment :
-	[nirvana.log]: [Mon Aug 06 14:19:42.707 UTC 2018] Operating System Environment :
-
-These log files are persisted. 
-
-Persistence (docker volumes)
-============================
-We persist the following UM server data:
-	
-* UM server data directory
-* UM server log files
-* UM server licence file
-* UM server users.txt file
-
-You can use the following command to check how many volumes are created.
-
-	docker volume ls
-	
-By default, the folders related to the volumes will be saved under the '*/var/lib/docker/volumes*' 
-folder in the Docker host machine. 
-
-Licence
-=======
-By default the license which is configured in the instance gets copied to the image and used.
-
-If you want to update the license file during the container run, then copy the valid license 
-to the license volume and start the container.
-
-Docker-compose (to run multiple docker container)
-=================================================
-The Docker Compose tool, 'docker-compose' automates the creation,
-deployment and interaction of multiple Docker
-containers from a configuration file, typically 'docker-compose.yml'.
-
-You need to copy the sample docker-compose i.e., '**docker-compose.yml**' file into the root of 
-your Software AG installation.
-
-The Docker-compose 'up' command will create the container from the configurations and run the 
-container.
-
-	docker-compose up
-	
-To stop the container, you can use the following command:
-
-	docker-compose down
-
-You can configure the image name which you have build using the '*docker build*' commands 
-mentioned above in the docker-compose.
-
-	version:"3.2"
-	services:
-	  node:
-		image:universalmessaging-server:1
-
-If you want to build the image using the docker file by passing build time arguments, 
-you can configure them as follows:
-
-	version:"3.2"
-	services:
-	  node:
-		build:
-		  context: .
-		  dockerfile: Dockerfile-alternate
-          args:
-			__instance_name: testserver
-
-You can configure the container name and exposed and mapped ports as well. 
-
-	version:"3.2"
-	services:
-	  node:
-		image:universalmessaging-server:1
-		container_name: umcontainer
-		ports:    
-		 - "9010:9000"
-		 
-You can configure the named volumes for the directories which you would like store.
-	
-	volumes:
-     - um_data:/opt/softwareag/UniversalMessaging/server/umserver/data
-	 
-You can configure the runtime parameters which you would like to pass to the container at runtime.
-
-	environment:
-     - REALM_NAME=umcontainer    
-
-You can find a sample docker-compose.yml file in the same location as the Dockerfile and 
-other scripts. For more configuration changes, please go through 
-[docker compose documentation](https://docs.docker.com/compose/)
-______________________
+_____________________
 These tools are provided as-is and without warranty or support. They do not constitute part of the Software AG product suite. Users are free to use, fork and modify them, subject to the license agreement. While Software AG welcomes contributions, we cannot guarantee to include every contribution in the master project.	
 _____________________
 For more information you can Ask a Question in the [TECHcommunity Forums](http://tech.forums.softwareag.com/techjforum/forums/list.page?product=messaging).
