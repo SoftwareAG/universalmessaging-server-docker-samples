@@ -173,6 +173,7 @@ runUMTool available inside the server container can also be used for administrat
 (https://documentation.softwareag.com/onlinehelp/Rohan/num10-3/10-3_UM_webhelp/index.html#page/um-webhelp%2Fto-header_clu_syntax_reference.html%23)
 
 to run runUMTool tool available inside the container. 
+
 	docker exec umcontainer runUMTool.sh ListChannels -rname=nsp://localhost:9000
 	
 Note:
