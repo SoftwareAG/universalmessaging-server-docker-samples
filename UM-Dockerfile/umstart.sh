@@ -32,15 +32,15 @@ umRealmServiceLog=UMRealmService.log
 # If you want to change the UM server name, you need to provide REALM_NAME as env variable during docker run, which will update it in Server_Common.conf file
 if [ ! -z "$REALM_NAME" ]; then
     if [ $INSTANCE_NAME = $REALM_NAME ]; then
-		    echo "UM instance name: $INSTANCE_NAME and UM realm name: $REALM_NAME are same"
+            echo "UM instance name: $INSTANCE_NAME and UM realm name: $REALM_NAME are same"
     else
-		    echo "UM instance name: $INSTANCE_NAME and UM realm name: $REALM_NAME are not same, Updating it to $REALM_NAME"
-	      cd $UM_HOME/server/$INSTANCE_NAME/bin
-	      sed -i "s|-DREALM=$INSTANCE_NAME|-DREALM=$REALM_NAME|" $SERVER_COMMON_CONF_FILE
+            echo "UM instance name: $INSTANCE_NAME and UM realm name: $REALM_NAME are not same, Updating it to $REALM_NAME"
+          cd $UM_HOME/server/$INSTANCE_NAME/bin
+          sed -i "s|-DREALM=$INSTANCE_NAME|-DREALM=$REALM_NAME|" $SERVER_COMMON_CONF_FILE
     fi
 fi
 
-# If you want to change the configurations related to JVM i.e, min max and direct memory, you can do it by providing INIT_JAVA_MEM_SIZE & MAX_JAVA_MEM_SIZE - 
+# If you want to change the configurations related to JVM i.e, min max and direct memory, you can do it by providing INIT_JAVA_MEM_SIZE & MAX_JAVA_MEM_SIZE -
 # - & MAX_DIRECT_MEM_SIZE as environment variables during docker run, which will be updated in Server_Common.conf file
 if [ ! -z "$INIT_JAVA_MEM_SIZE" ]; then
     echo "Updating UM init Java Heap value to $INIT_JAVA_MEM_SIZE"
@@ -57,7 +57,7 @@ fi
 if [ ! -z "$MAX_DIRECT_MEM_SIZE" ]; then
     echo "Updating UM Max Direct Memory value to $MAX_DIRECT_MEM_SIZE"
     cd $UM_HOME/server/$INSTANCE_NAME/bin
-	  sed -i "s|\(.*\)=-XX:MaxDirectMemorySize=\(.*\)|\1=-XX:MaxDirectMemorySize=$MAX_DIRECT_MEM_SIZE|" $SERVER_COMMON_CONF_FILE
+      sed -i "s|\(.*\)=-XX:MaxDirectMemorySize=\(.*\)|\1=-XX:MaxDirectMemorySize=$MAX_DIRECT_MEM_SIZE|" $SERVER_COMMON_CONF_FILE
 fi
 # If you want to enable Basic auth and to enable and mandate it, you can do it by providing BASIC_AUTH_ENABLE & BASIC_AUTH_MANDATORY as env variables during docker run,
 # which will update the values in Server_Common.conf file
@@ -70,7 +70,7 @@ fi
 if [ ! -z "$BASIC_AUTH_MANDATORY" ]; then
     echo "Enabling and Mandating the Basic Auth for UM server"
     cd $UM_HOME/server/$INSTANCE_NAME/bin
-	  sed -i "s|\(.*\)=-DNirvana.auth.mandatory=\(.*\)|\1=-DNirvana.auth.mandatory=$BASIC_AUTH_MANDATORY|" $SERVER_COMMON_CONF_FILE
+      sed -i "s|\(.*\)=-DNirvana.auth.mandatory=\(.*\)|\1=-DNirvana.auth.mandatory=$BASIC_AUTH_MANDATORY|" $SERVER_COMMON_CONF_FILE
 fi
 
 ###############################################################################
