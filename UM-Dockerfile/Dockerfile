@@ -60,6 +60,7 @@ RUN mkdir -p $SAG_HOME/common && chown 1724:1724 $SAG_HOME/common
 # Copy the required binaries from installation to image
 COPY --chown=1724:1724 ./common/bin/ $SAG_HOME/common/bin/
 COPY --chown=1724:1724 ./common/lib/ $SAG_HOME/common/lib/
+COPY --chown=1724:1724 ./common/metering/ $SAG_HOME/common/metering/
 COPY --chown=1724:1724 ./common/conf/users.txt $USERS_DIR/users.txt
 COPY --chown=1724:1724 ./UniversalMessaging/server/$INSTANCE_NAME/bin $UM_HOME/server/$INSTANCE_NAME/bin
 COPY --chown=1724:1724 ./UniversalMessaging/lib/ $UM_HOME/lib/
