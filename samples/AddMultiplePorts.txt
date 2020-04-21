@@ -1,0 +1,31 @@
+
+
+
+Adding multiple ports in Universal Messaging Server Container
+------------------------------------------------------------
+
+By default Universal Messaging server image contains default server instance (umserver) with only one port open(9000).
+Inorder to add more ports to a running server in docker container, following steps can be used.
+
+1.  docker run -d -v datadir:/opt/softwareag/UniversalMessaging/server/umserver/data  -p 9500:9000 --name umcontainer um-image:1 
+	
+	start a docker container from universal Server image with 'data' directory volume mapping.so that any changes done to data directory can be persisted.
+
+2. Connect to the server using any of the administration tools (Enterprise Manager, runUMTool) and add a new port on server and enable the 'auto start' flag.
+
+	From runUmtool the following command can be used to add a new interface 
+	docker exec -i umcontainer runUMTool.sh AddSSLInterface -adapter=0.0.0.0 -port=9088 -rname=nsp://localhost:9000
+	user can further customize the interface related configurations on the server(basic, certificates configurations).
+
+3. Stop the container 
+	docker stop umcontainer
+
+4. remove the container 
+	docker rm umcontianer
+
+5. start a new container with the same volume maping as in step 1 and expose the new port.
+	docker run -d -v datadir:/opt/softwareag/UniversalMessaging/server/umserver/data  -p 9500:9000 -p9501:9088 --name umcontainer um-image:1
+
+
+
+
