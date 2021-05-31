@@ -27,7 +27,7 @@ Prerequisites
 This package makes the following assumptions:
 
 * You have some familiarity with the Docker technology.
-* You have Universal Messaging 10.5 installed on a 64-bit Linux machine using 
+* You have Universal Messaging 10.7 installed on a 64-bit Linux machine using 
 the Software AG installer.
 * All the latest available fixes are installed for Universal Messaging Server and Template applications.
 * A Universal Messaging realm server instance has been created.
@@ -54,7 +54,7 @@ From that directory, use the following command to build the image:
     
 The **__instance_name** argument can be used as a docker build argument to create a Docker image out 
 of a specific Universal Messaging server instance. 
-(e.g.: docker build  --build-arg __instance_name=um105 --tag um-image:1 .)
+(e.g.: docker build  --build-arg __instance_name=um107 --tag um-image:1 .)
 Docker will output its progress, and after a minute or so will exit with a
 message like:
 
