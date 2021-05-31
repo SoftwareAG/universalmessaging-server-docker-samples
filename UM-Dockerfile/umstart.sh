@@ -1,6 +1,6 @@
 #################################################################################
 # Copyright (c) 1999 - 2011 my-Channels Ltd
-# Copyright (c) 2012 - 2019 Software AG, Darmstadt, Germany and/or its licensors
+# Copyright (c) 2012 - 2020 Software AG, Darmstadt, Germany and/or its licensors
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -40,7 +40,7 @@ if [ ! -z "$REALM_NAME" ]; then
     fi
 fi
 
-# If you want to change the configurations related to JVM i.e, min max and direct memory, you can do it by providing INIT_JAVA_MEM_SIZE & MAX_JAVA_MEM_SIZE - 
+# If you want to change the configurations related to JVM i.e, min max and direct memory, you can do it by providing INIT_JAVA_MEM_SIZE & MAX_JAVA_MEM_SIZE -
 # - & MAX_DIRECT_MEM_SIZE as environment variables during docker run, which will be updated in Server_Common.conf file
 if [ ! -z "$INIT_JAVA_MEM_SIZE" ]; then
     echo "Updating UM init Java Heap value to $INIT_JAVA_MEM_SIZE"
@@ -100,6 +100,10 @@ cd $LOG_DIR
 touch $nirvanaLog $umRealmServiceLog
 tail -F $umRealmServiceLog | sed "s|^|[$umRealmServiceLog]: |" > /dev/stdout &
 tail -F $nirvanaLog | sed "s|^|[$nirvanaLog]: |" > /dev/stdout &
+
+if [[ ! -z "$ADD_HEALTH_CHECK" && "$ADD_HEALTH_CHECK"="true" ]]; then
+    runUMTool.sh AddHealthMonitorPlugin -dirName=$DATA_DIR -protocol=http -adapter=0.0.0.0 -port=$PORT -mountpath=health -autostart=true
+fi
 
 # run the umserver
 cd $UM_HOME/server/$INSTANCE_NAME/bin/

@@ -1,6 +1,6 @@
 #################################################################################
 # Copyright (c) 1999 - 2011 my-Channels Ltd
-# Copyright (c) 2012 - 2019 Software AG, Darmstadt, Germany and/or its licensors
+# Copyright (c) 2012 - 2020 Software AG, Darmstadt, Germany and/or its licensors
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -49,12 +49,13 @@ MAINTAINER SoftwareAG
 ENV INSTANCE_NAME=$__instance_name
 ENV	UM_HOME=$SAG_HOME/UniversalMessaging
 ENV PORT=9000 \
+    JMX_AGENT_PORT=9200 \
 	DATA_DIR=$UM_HOME/server/$INSTANCE_NAME/data \
     LOG_DIR=$UM_HOME/server/$INSTANCE_NAME/logs \
     LIC_DIR=$UM_HOME/server/$INSTANCE_NAME/licence \
     USERS_DIR=$SAG_HOME/common/conf \
     SERVER_COMMON_CONF_FILE=Server_Common.conf \
-    TOOLS_DIR=$UM_HOME/tools 
+    TOOLS_DIR=$UM_HOME/tools
 
 # Create the required folders (data, logs, licence and tools) as these are not going to be copied from the installation, but will be needed at runtime
 RUN mkdir -p $DATA_DIR $LOG_DIR $LIC_DIR $TOOLS_DIR $DATA_DIR/heap_dumps && chown 1724:1724 $DATA_DIR && chown 1724:1724 $LOG_DIR && chown 1724:1724 $LIC_DIR && chown 1724:1724 $TOOLS_DIR && chown 1724:1724 $DATA_DIR/heap_dumps
@@ -67,7 +68,6 @@ COPY --chown=1724:1724 ./common/metering/ $SAG_HOME/common/metering/
 COPY --chown=1724:1724 ./common/conf/users.txt $USERS_DIR/users.txt
 COPY --chown=1724:1724 ./UniversalMessaging/server/$INSTANCE_NAME/bin $UM_HOME/server/$INSTANCE_NAME/bin
 COPY --chown=1724:1724 ./UniversalMessaging/lib/ $UM_HOME/lib/
-COPY --chown=1724:1724 ./UniversalMessaging/classes/ $UM_HOME/classes/
 COPY --chown=1724:1724 ./UniversalMessaging/tools/runner/ $TOOLS_DIR/runner/
 
 # Copy the entry point script
