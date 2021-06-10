@@ -79,10 +79,10 @@ COPY --chown=$SAG_USER:$SAG_USER_GROUP ./UniversalMessaging/server/$INSTANCE_NAM
 COPY --chown=$SAG_USER:$SAG_USER_GROUP ./configure.sh $SAG_HOME/configure.sh
 
 # Change permissions for entry point script
-RUN chmod 775 $SAG_HOME/umstart.sh
+RUN chmod u+x $SAG_HOME/umstart.sh
 
 # Change the permissions to configure.sh and run it
-RUN chmod 775 $SAG_HOME/configure.sh ;\
+RUN chmod u+x $SAG_HOME/configure.sh ;\
     $SAG_HOME/configure.sh
 
 # To give permissions to the root group when using OpenShift
