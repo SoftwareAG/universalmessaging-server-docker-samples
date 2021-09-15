@@ -153,7 +153,7 @@ You can administrate the Universal Messaging server running in a container by us
 administration tools (Enterprise Manager, runUMTool, etc.). A mapped host machine port 
 should be used to connect to the server.
 
-The runUMTool available inside the server container can also be used for administrative purposes. See the [description of the runUMTool](https://documentation.softwareag.com/onlinehelp/Rohan/num10-5/10-5_UM_webhelp/index.html#page/um-webhelp%2Fto-header_clu_syntax_reference.html).
+The runUMTool available inside the server container can also be used for administrative purposes. See the [description of the runUMTool](https://documentation.softwareag.com/universal_messaging/num10-7/10-7_UM_webhelp/index.html#page/um-webhelp%2Fto-header_clu_syntax_reference.html).
 
 To run the runUMTool tool available inside the container, use a command like this: 
 
@@ -182,6 +182,8 @@ pass are:
 
 Note: The default value for all the above runtime parameters is whatever is present in the 
 Server_Common.conf file of that particular Universal Messaging instance in the installation. 
+	
+Note: After the REALM_NAME environment property is set and persisted, you cannot change the realm name.
 	
 You can pass the configurations as follows:
 
