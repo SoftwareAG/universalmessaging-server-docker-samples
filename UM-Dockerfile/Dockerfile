@@ -34,7 +34,7 @@ COPY --chown=1724:1724 ./jvm/jvm/ $SAG_HOME/jvm/jvm/
 
 ENV PATH=$SAG_HOME:$SAG_HOME/jvm/jvm:$PATH
 
-#update all the packages in centos base image.
+#update all the packages in centos base image. 
 RUN yum -y update && yum -y clean all
 
 USER 1724
@@ -49,13 +49,13 @@ MAINTAINER SoftwareAG
 ENV INSTANCE_NAME=$__instance_name
 ENV	UM_HOME=$SAG_HOME/UniversalMessaging
 ENV PORT=9000 \
-    JMX_AGENT_PORT=9200 \
+    JMX_AGENT_PORT=9200 \    
 	DATA_DIR=$UM_HOME/server/$INSTANCE_NAME/data \
     LOG_DIR=$UM_HOME/server/$INSTANCE_NAME/logs \
     LIC_DIR=$UM_HOME/server/$INSTANCE_NAME/licence \
     USERS_DIR=$SAG_HOME/common/conf \
     SERVER_COMMON_CONF_FILE=Server_Common.conf \
-    TOOLS_DIR=$UM_HOME/tools
+    TOOLS_DIR=$UM_HOME/tools 
 
 # Create the required folders (data, logs, licence and tools) as these are not going to be copied from the installation, but will be needed at runtime
 RUN mkdir -p $DATA_DIR $LOG_DIR $LIC_DIR $TOOLS_DIR $DATA_DIR/heap_dumps && chown 1724:1724 $DATA_DIR && chown 1724:1724 $LOG_DIR && chown 1724:1724 $LIC_DIR && chown 1724:1724 $TOOLS_DIR && chown 1724:1724 $DATA_DIR/heap_dumps

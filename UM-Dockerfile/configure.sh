@@ -42,7 +42,7 @@ sed -i "s|\(data\)=\(.*\)|\1=$UM_HOME/server/$INSTANCE_NAME/data ; export data|"
 # Changing the default locations of nirvana.log and UMRealmService.log to common location, i.e., server/<instance_name>/logs folder.
 sed -i "s|\(.*\)=UMRealmService.log|\1=$LOG_DIR/UMRealmService.log|" $SERVER_COMMON_CONF_FILE
 sed -i "s|\(.*\)="\""-DLOGFILE=\(.*\)|\1="\""-DLOGFILE=$LOG_DIR/nirvana.log"\""|" $SERVER_COMMON_CONF_FILE
-# Changing the um server port number to 9000. As the port number is fixed, irrespective of copied umserver port it will be always 9000.
+# Changing the um server port number to 9000. As the port number is fixed, irrespective of copied umserver port it will be always 9000. 
 sed -i "s|\(.*\)=-DADAPTER_0=\(.*\)|\1=-DADAPTER_0=nhp://0.0.0.0:$PORT|" $SERVER_COMMON_CONF_FILE
 #Changing the JMX Exporter agent destination and it's configuration file jmx_exporter_yaml
 sed -i "s|\(.*=-javaagent:\)\(.*jmx_prometheus_javaagent.*\)|\1$UM_HOME/lib/jmx_prometheus_javaagent.jar=0.0.0.0:$JMX_AGENT_PORT:$UM_HOME/server/$INSTANCE_NAME/bin/jmx_exporter.yaml|" $SERVER_COMMON_CONF_FILE

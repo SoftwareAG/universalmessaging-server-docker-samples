@@ -19,21 +19,21 @@
 version: "3.2"
 services:
   node:
-    # Create the node using image. Below replace the "um_image_name_you_built" with Universal Messaging image name that built
-    image: um_image_name_you_built
-    #    build:                        # build using Dockerfile
-    #      context: .                  # context, installation folder
-    #      dockerfile: Dockerfile      # which contains instructions to build the image
-    #      args:
-    #        __instance_name: testserver        # If user wants to copy different instance from installation, can specify here
+# Create the node using image. Below replace the "um_image_name_you_built" with Universal Messaging image name that built
+    image: um_image_name_you_built 
+#    build:                        # build using Dockerfile
+#      context: .                  # context, installation folder
+#      dockerfile: Dockerfile      # which contains instructions to build the image
+#      args:
+#        __instance_name: testserver        # If user wants to copy different instance from installation, can specify here
     container_name: umcontainer
     ports:                         # expose the um server port, mappedport:exposed port
-      - "9010:9000"
+     - "9010:9000"
     volumes:                       # Persisting the data directory, logs, licence and users information
-      - um_data:/opt/softwareag/UniversalMessaging/server/umserver/data
-      - um_logs:/opt/softwareag/UniversalMessaging/server/umserver/logs
-      - um_licence:/opt/softwareag/UniversalMessaging/server/umserver/licence
-      - um_users:/opt/softwareag/common/conf
+     - um_data:/opt/softwareag/UniversalMessaging/server/umserver/data
+     - um_logs:/opt/softwareag/UniversalMessaging/server/umserver/logs
+     - um_licence:/opt/softwareag/UniversalMessaging/server/umserver/licence
+     - um_users:/opt/softwareag/common/conf
 # environment:                  # runtime parameters for the um container, if the user wants to have different value for these parameters he can modify here
 #     - REALM_NAME=umcontainer    
 #     - INIT_JAVA_MEM_SIZE
