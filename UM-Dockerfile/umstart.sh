@@ -33,9 +33,9 @@ umRealmServiceLog=UMRealmService.log
 if [ ! -z "$REALM_NAME" ]; then
     if [ $INSTANCE_NAME = $REALM_NAME ]; then
 		    echo "UM instance name: $INSTANCE_NAME and UM realm name: $REALM_NAME are same"
-    # if the realm name is already set it will be stored in realms.nst file. So in that case we will ignore it
+	# if the realm name is already set it will be stored in realms.nst file. So in that case we will ignore it
     elif [ -e $DATA_DIR/RealmSpecific/realms.nst ]; then
-		    echo "REALM name is already set. So new Realm name $REALM_NAME is ignored"
+		  	echo "REALM name is already set. So new Realm name $REALM_NAME is ignored"
     else
 		    echo "UM instance name: $INSTANCE_NAME and UM realm name: $REALM_NAME are not same, Updating it to $REALM_NAME"
 	      cd $UM_HOME/server/$INSTANCE_NAME/bin
@@ -103,6 +103,10 @@ cd $LOG_DIR
 touch $nirvanaLog $umRealmServiceLog
 tail -F $umRealmServiceLog | sed "s|^|[$umRealmServiceLog]: |" > /dev/stdout &
 tail -F $nirvanaLog | sed "s|^|[$nirvanaLog]: |" > /dev/stdout &
+
+if [[ ! -z "$ADD_HEALTH_CHECK" && "$ADD_HEALTH_CHECK"="true" ]]; then
+    runUMTool.sh AddHealthMonitorPlugin -dirName=$DATA_DIR -protocol=http -adapter=0.0.0.0 -port=$PORT -mountpath=health -autostart=true
+fi
 
 # run the umserver
 cd $UM_HOME/server/$INSTANCE_NAME/bin/

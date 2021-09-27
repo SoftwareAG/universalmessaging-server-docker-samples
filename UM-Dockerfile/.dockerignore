@@ -29,7 +29,7 @@ common/bin/protoc
 !common/lib/saglic.jar
 !common/lib/jacocoagent.jar
 !common/lib/tw-*
-!common/lib/ext/log4j
+!common/lib/ext/log4j	
 
 
 !Dockerfile
