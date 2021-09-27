@@ -182,7 +182,7 @@ pass are:
 
 Note: The default value for all the above runtime parameters is whatever is present in the 
 Server_Common.conf file of that particular Universal Messaging instance in the installation. 
-	
+
 Note: After the REALM_NAME environment property is set and persisted, you cannot change the realm name.
 	
 You can pass the configurations as follows:
