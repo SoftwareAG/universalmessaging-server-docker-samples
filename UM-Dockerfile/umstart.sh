@@ -40,7 +40,7 @@ if [ ! -z "$REALM_NAME" ]; then
     fi
 fi
 
-# If you want to change the configurations related to JVM i.e, min max and direct memory, you can do it by providing INIT_JAVA_MEM_SIZE & MAX_JAVA_MEM_SIZE -
+# If you want to change the configurations related to JVM i.e, min max and direct memory, you can do it by providing INIT_JAVA_MEM_SIZE & MAX_JAVA_MEM_SIZE - 
 # - & MAX_DIRECT_MEM_SIZE as environment variables during docker run, which will be updated in Server_Common.conf file
 if [ ! -z "$INIT_JAVA_MEM_SIZE" ]; then
     echo "Updating UM init Java Heap value to $INIT_JAVA_MEM_SIZE"

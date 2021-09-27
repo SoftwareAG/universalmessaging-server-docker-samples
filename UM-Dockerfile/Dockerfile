@@ -34,7 +34,7 @@ COPY --chown=1724:1724 ./jvm/jvm/ $SAG_HOME/jvm/jvm/
 
 ENV PATH=$SAG_HOME:$SAG_HOME/jvm/jvm:$PATH
 
-#update all the packages in centos base image.
+#update all the packages in centos base image. 
 RUN yum -y update && yum -y clean all
 
 USER 1724
