@@ -58,7 +58,7 @@ MAINTAINER SoftwareAG
 
 # Environment variables
 ENV INSTANCE_NAME=$__instance_name
-ENV UM_HOME=$SAG_HOME/UniversalMessaging
+ENV	UM_HOME=$SAG_HOME/UniversalMessaging
 ENV SAG_USER_ID=1724
 ENV SAG_USER_NAME=sagadmin
 ENV SAG_GROUP_ID=1724
