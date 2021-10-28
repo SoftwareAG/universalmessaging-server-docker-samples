@@ -1,6 +1,6 @@
 #################################################################################
 # Copyright (c) 1999 - 2011 my-Channels Ltd
-# Copyright (c) 2012 - 2020 Software AG, Darmstadt, Germany and/or its licensors
+# Copyright (c) 2012 - 2021 Software AG, Darmstadt, Germany and/or its licensors
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -26,16 +26,13 @@ nirvanaLog=nirvana.log
 umRealmServiceLog=UMRealmService.log
 
 ###############################################################################
-# UM Runtime Configuation related scripts
+# UM Runtime Configuration related scripts
 ###############################################################################
 
 # If you want to change the UM server name, you need to provide REALM_NAME as env variable during docker run, which will update it in Server_Common.conf file
 if [ ! -z "$REALM_NAME" ]; then
-    if [ $INSTANCE_NAME = $REALM_NAME ]; then
-		    echo "UM instance name: $INSTANCE_NAME and UM realm name: $REALM_NAME are same"
-	# if the realm name is already set it will be stored in realms.nst file. So in that case we will ignore it
-    elif [ -e $DATA_DIR/RealmSpecific/realms.nst ]; then
-		  	echo "REALM name is already set. So new Realm name $REALM_NAME is ignored"
+    if [ -e $DATA_DIR/RealmSpecific/realms.nst ]; then
+		  	echo "Realm name is configured. So the new realm name may be ignored"
     else
 		    echo "UM instance name: $INSTANCE_NAME and UM realm name: $REALM_NAME are not same, Updating it to $REALM_NAME"
 	      cd $UM_HOME/server/$INSTANCE_NAME/bin
@@ -76,6 +73,7 @@ if [ ! -z "$BASIC_AUTH_MANDATORY" ]; then
 	  sed -i "s|\(.*\)=-DNirvana.auth.mandatory=\(.*\)|\1=-DNirvana.auth.mandatory=$BASIC_AUTH_MANDATORY|" $SERVER_COMMON_CONF_FILE
 fi
 
+
 ###############################################################################
 # Function  Declaration: which does shutting down of um server
 ###############################################################################
@@ -104,8 +102,14 @@ touch $nirvanaLog $umRealmServiceLog
 tail -F $umRealmServiceLog | sed "s|^|[$umRealmServiceLog]: |" > /dev/stdout &
 tail -F $nirvanaLog | sed "s|^|[$nirvanaLog]: |" > /dev/stdout &
 
-if [[ ! -z "$ADD_HEALTH_CHECK" && "$ADD_HEALTH_CHECK"="true" ]]; then
-    runUMTool.sh AddHealthMonitorPlugin -dirName=$DATA_DIR -protocol=http -adapter=0.0.0.0 -port=$PORT -mountpath=health -autostart=true
+#Add health monitor plugin in 'health' mountpath. this plugin will be used for docker health check.
+runUMTool.sh AddHealthMonitorPlugin -dirName=$DATA_DIR -protocol=http -adapter=0.0.0.0 -port=$PORT -mountpath=health -autostart=true
+
+#if there is any startup command configured then run it in parallel
+if [ ! -z "$STARTUP_COMMAND" ]; then
+    cd $SAG_HOME
+    echo "calling start up commands in parallel. once the server is ready commands will be executed"
+    uminitialize.sh &
 fi
 
 # run the umserver
