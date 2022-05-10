@@ -64,8 +64,8 @@ ENV SAG_USER_NAME=sagadmin
 ENV SAG_GROUP_ID=1724
 ENV SAG_GROUP_NAME=sagadmin
 ENV PORT=9000 \
-    JMX_PORT=9200 \    
-	DATA_DIR=$UM_HOME/server/$INSTANCE_NAME/data \
+    JMX_AGENT_PORT=9200 \
+  	DATA_DIR=$UM_HOME/server/$INSTANCE_NAME/data \
     LOG_DIR=$UM_HOME/server/$INSTANCE_NAME/logs \
     LIC_DIR=$UM_HOME/server/$INSTANCE_NAME/licence \
     USERS_DIR=$SAG_HOME/common/conf \
@@ -96,9 +96,6 @@ COPY --chown=$SAG_USER_ID:$SAG_GROUP_ID ./umstart.sh $SAG_HOME/umstart.sh
 # Change permissions for entry point script
 RUN chmod u+x $SAG_HOME/umstart.sh
 
-# Move the licence file to Universal Messaging licence folder
-COPY --chown=$SAG_USER_ID:$SAG_GROUP_ID ./UniversalMessaging/server/$INSTANCE_NAME/licence.xml $LIC_DIR/licence.xml
-
 # Copy the configure.sh which contains all the build time configuration changes
 COPY --chown=$SAG_USER_ID:$SAG_GROUP_ID ./configure.sh $SAG_HOME/configure.sh
 
@@ -108,6 +105,8 @@ COPY --chown=$SAG_USER_ID:$SAG_GROUP_ID ./uminitialize.sh $SAG_HOME/uminitialize
 # Change the permissions to startupCommands.sh and run it
 RUN chmod u+x $SAG_HOME/uminitialize.sh
 
+# copy the 3rdPartyLicenses.pdf which contains all third party license details
+COPY --chown=$SAG_USER_ID:$SAG_GROUP_ID ./3rdPartyLicenses.pdf $SAG_HOME/3rdPartyLicenses_NUM_UniversalMessagingDocker.pdf
 
 # Change the permissions to configure.sh and run it
 RUN chmod u+x $SAG_HOME/configure.sh ;\
@@ -134,4 +133,4 @@ ENTRYPOINT umstart.sh
 HEALTHCHECK --interval=15s --timeout=30s --start-period=120s  CMD curl --fail http://localhost:$PORT/health/ || exit 1
 
 EXPOSE $PORT
-EXPOSE $JMX_PORT
+EXPOSE $JMX_AGENT_PORT
