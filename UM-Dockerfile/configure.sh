@@ -1,21 +1,3 @@
-#################################################################################
-# Copyright (c) 1999 - 2011 my-Channels Ltd
-# Copyright (c) 2012 - 2021 Software AG, Darmstadt, Germany and/or its licensors
-#
-# SPDX-License-Identifier: Apache-2.0
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-#################################################################################
 #!/bin/bash
 
 # Modify the installation directory path to /opt/softwareag in Server_Common.conf, nserver, nserverdaemon, nserverdaemon.conf and nstopserver.
@@ -46,8 +28,11 @@ sed -i "s|\(.*\)="\""-DLOGFILE=\(.*\)|\1="\""-DLOGFILE=$LOG_DIR/nirvana.log"\""|
 sed -i "s|\(.*\)=-DADAPTER_0=\(.*\)|\1=-DADAPTER_0=nhp://0.0.0.0:$PORT|" $SERVER_COMMON_CONF_FILE
 #Changing the JMX Exporter agent destination and it's configuration file jmx_exporter_yaml
 sed -i "s|\(.*26=-javaagent:\)\(.*jmx_prometheus_javaagent.*\)|\1$UM_HOME/lib/jmx_prometheus_javaagent.jar=0.0.0.0:$JMX_AGENT_PORT:$UM_HOME/server/$INSTANCE_NAME/bin/jmx_exporter.yaml|" $SERVER_COMMON_CONF_FILE
-#Changing the JMX Exporter agent destination and it's configuration file jmx_sag_um_exporter.yaml
-sed -i "s|\(.*27=-javaagent:\)\(.*jmx_prometheus_javaagent.*\)|\1$UM_HOME/lib/jmx_prometheus_javaagent.jar=0.0.0.0:$JMX_AGENT_PORT:$UM_HOME/server/$INSTANCE_NAME/bin/jmx_sag_um_exporter.yaml|" $SERVER_COMMON_CONF_FILE
+#Changing the JMX Exporter agent destination and it's configuration file jmx_sag_um_exporter.yaml, uncommenting to enable the JMX agent
+sed -i "s|\(.*wrapper.java.additional.27.*\)|\wrapper.java.additional.27=-javaagent:$UM_HOME/lib/jmx_prometheus_javaagent.jar=0.0.0.0:$JMX_AGENT_PORT:$UM_HOME/server/$INSTANCE_NAME/bin/jmx_sag_um_exporter.yaml|" $SERVER_COMMON_CONF_FILE
+#Enable JMX config
+sed -i "s|\(.*28=.*\)|wrapper.java.additional.28=-DENABLE_JMX=TRUE|" $SERVER_COMMON_CONF_FILE
+
 # if the data directory is non-default location. Changing the location to fixed one in image.
 sed -i "s|\(.*\)="\""-DDATADIR=\(.*\)|\1="\""-DDATADIR=$UM_HOME/server/$INSTANCE_NAME/data"\""|" $SERVER_COMMON_CONF_FILE
 # Change the default configuration in the config file for licence file
@@ -69,4 +54,19 @@ sed -i "s|-DinstallDir=.*\/common\/runtime|-DinstallDir=$SAG_HOME\/common\/runti
 sed -i "s|DEFAULT_PATH=.*common|DEFAULT_PATH=$SAG_HOME/common|" $certtool
 sed -i "s|KEYTOOL_PATH=.*\/jvm\/jvm|KEYTOOL_PATH=$SAG_HOME/jvm/jvm|" $certtool
 
-
+# if we have copied the Java sample apps directory to the image (this currently happens only for internal images created from the SIC sandbox),
+# then we need to also modify the config files for each tool to refer to the proper directory inside the image`
+if [ -d $UM_HOME/java/$INSTANCE_NAME/bin ];
+then
+	cd $UM_HOME/java/$INSTANCE_NAME/bin
+	
+	for i in `ls -1 --ignore='*.*'`; 
+	do
+		if [ -e $i.conf ];
+		then
+			sed -i "s|\(wrapper.working.dir\)=\(.*\)|\1=$UM_HOME/java/$INSTANCE_NAME/bin/|" $i.conf
+			sed -i "s|\(#include \).*\($i-licence.conf\)|\1$UM_HOME/java/$INSTANCE_NAME/bin/\2|" $i.conf
+			sed -i "s|\(#include \).*\(Samples_Common.conf\)|\1$UM_HOME/java/$INSTANCE_NAME/bin/\2|" $i.conf
+		fi	
+	done
+fi
