@@ -111,12 +111,15 @@ the following directories:
                                 to persist the data directory to volumes.
 * UM server logs directory    - <installationDir>/UniversalMessaging/server/umserver/logs. This directory
                                 is persisted to help diagnose issues.
-* UM server licence directory - <installationDir>/UniversalMessaging/server/umserver/license. 
+* UM server licence directory - <installationDir>/UniversalMessaging/server/umserver/licence. 
                               This directory is persisted in order to update the 
                                 license file seamlessly.
 * UM server users  directory  - <installationDir>/common/conf. This directory is persisted on the 
                                 volume, which enables you to add and delete users for 
                                 Universal Messaging. 
+
+**Important:** Both licence directory and licence.xml file are spelled with "c".
+If you do not provide the correct file name, licensing will be unsuccessful.
 
 You can use the following command to check how many volumes are created:
 
@@ -133,6 +136,8 @@ By default, no license is used in the image. If you want to update the
 license file for a container, stop the container and copy the new license file to 
 the mapped license file directory on volumes and then restart the container.
 
+**Important:** Both licence directory and licence.xml file are spelled with "c".
+If you do not provide the correct file name, licensing will be unsuccessful.
 
 Docker-compose (to run multiple Docker containers)
 ==================================================
