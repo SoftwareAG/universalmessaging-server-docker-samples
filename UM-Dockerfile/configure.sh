@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Modify the installation directory path to /opt/softwareag in Server_Common.conf, nserver, nserverdaemon, nserverdaemon.conf and nstopserver.
+# Modify the installation directory path to /opt/softwareag in Server_Common.conf, Custom_Server_Common.conf, nserver, nserverdaemon, nserverdaemon.conf and nstopserver.
 # A few more modifications are related to default and non-default path updates.
 
 cd $UM_HOME/server/$INSTANCE_NAME/bin
@@ -30,8 +30,33 @@ sed -i "s|\(.*\)=-DADAPTER_0=\(.*\)|\1=-DADAPTER_0=nhp://0.0.0.0:$PORT|" $SERVER
 sed -i "s|\(.*26=-javaagent:\)\(.*jmx_prometheus_javaagent.*\)|\1$UM_HOME/lib/jmx_prometheus_javaagent.jar=0.0.0.0:$JMX_AGENT_PORT:$UM_HOME/server/$INSTANCE_NAME/bin/jmx_exporter.yaml|" $SERVER_COMMON_CONF_FILE
 #Changing the JMX Exporter agent destination and it's configuration file jmx_sag_um_exporter.yaml, uncommenting to enable the JMX agent
 sed -i "s|\(.*wrapper.java.additional.27.*\)|\wrapper.java.additional.27=-javaagent:$UM_HOME/lib/jmx_prometheus_javaagent.jar=0.0.0.0:$JMX_AGENT_PORT:$UM_HOME/server/$INSTANCE_NAME/bin/jmx_sag_um_exporter.yaml|" $SERVER_COMMON_CONF_FILE
-#Enable JMX config
-sed -i "s|\(.*28=.*\)|wrapper.java.additional.28=-DENABLE_JMX=TRUE|" $SERVER_COMMON_CONF_FILE
+
+#Iterating through the Server_Common.conf, Custom_Server_Common.conf files to get the highest wrapper_java_additional index used in the files
+highest_wrapper_java_additional_index=0
+
+function get_highest_wrapper_java_additional_index() {
+  filename=$1
+  while read line
+  do
+  if [[ $line == *"wrapper.java.additional."* ]]; then
+    #get all the digits from line and extract 1st set of digits
+    digits=( $(echo $line | grep -o -E '[0-9]+') )
+    index=${digits[0]}
+    if [ ! -z $index ] && [ $index -gt $highest_wrapper_java_additional_index ]; then
+      highest_wrapper_java_additional_index=$index
+    fi
+  fi
+  done < $filename
+}
+
+get_highest_wrapper_java_additional_index $SERVER_COMMON_CONF_FILE
+get_highest_wrapper_java_additional_index $CUSTOM_SERVER_COMMON_CONF_FILE
+
+((highest_wrapper_java_additional_index=$highest_wrapper_java_additional_index+1))
+echo "Adding wrapper.java.additional."$highest_wrapper_java_additional_index"=-DENABLE_JMX=true to Tanuki wrapper configuration file"
+
+#Adding wrapper_java_additional index to enable the JMX config on start of the container
+sed -i "/bin\/jmx_sag_um_exporter.yaml/ a wrapper.java.additional.$highest_wrapper_java_additional_index=-DENABLE_JMX=true" $SERVER_COMMON_CONF_FILE
 
 # if the data directory is non-default location. Changing the location to fixed one in image.
 sed -i "s|\(.*\)="\""-DDATADIR=\(.*\)|\1="\""-DDATADIR=$UM_HOME/server/$INSTANCE_NAME/data"\""|" $SERVER_COMMON_CONF_FILE

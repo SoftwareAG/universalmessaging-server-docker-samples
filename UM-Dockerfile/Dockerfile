@@ -70,6 +70,7 @@ ENV PORT=9000 \
     LIC_DIR=$UM_HOME/server/$INSTANCE_NAME/licence \
     USERS_DIR=$SAG_HOME/common/conf \
     SERVER_COMMON_CONF_FILE=Server_Common.conf \
+    CUSTOM_SERVER_COMMON_CONF_FILE=Custom_Server_Common.conf \
     TOOLS_DIR=$UM_HOME/tools 
 
 # Create the required folders (data, logs, licence and tools) as these are not going to be copied from the installation, but will be needed at runtime

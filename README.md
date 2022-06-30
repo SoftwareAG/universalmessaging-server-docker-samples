@@ -75,7 +75,7 @@ ports to access the server from the outside world using a URL such as nsp://<doc
 
 Turning your new image into a running container will look similar to this:
 
-  docker run -d -p 9000:9000 --name umservercontainer universalmessaging-server:dev_image
+    docker run -d -p 9000:9000 --name umservercontainer universalmessaging-server:dev_image
 
 You can then look for your running container:
 
@@ -83,6 +83,10 @@ You can then look for your running container:
 
     CONTAINER ID   IMAGE                                COMMAND                    CREATED            STATUS             PORTS                    NAMES
     a15557bccc7c   universalmessaging-server:dev_image  "/bin/sh -c umstart.…"     6 seconds ago      Up 5 seconds       0.0.0.0:9000->9000/tcp   umservercontainer
+
+Note: To access the JMX Prometheus agent from the outside world, need to map the container port 9200 to one of the host machine port
+
+    docker run -d -p 9000:9000 -p 9200:9200 --name umservercontainer universalmessaging-server:dev_image
 
 Log files
 =========
