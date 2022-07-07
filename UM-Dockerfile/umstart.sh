@@ -1,6 +1,6 @@
 #################################################################################
 # Copyright (c) 1999 - 2011 my-Channels Ltd
-# Copyright (c) 2012 - 2021 Software AG, Darmstadt, Germany and/or its licensors
+# Copyright (c) 2012 - 2022 Software AG, Darmstadt, Germany and/or its licensors
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -32,7 +32,7 @@ umRealmServiceLog=UMRealmService.log
 # If you want to change the UM server name, you need to provide REALM_NAME as env variable during docker run, which will update it in Server_Common.conf file
 if [ ! -z "$REALM_NAME" ]; then
     if [ -e $DATA_DIR/RealmSpecific/realms.nst ]; then
-		  	echo "Realm name is configured. So the new realm name may be ignored"
+		  	echo "REALM name is configured. So new realm name may be ignored"
     else
 		    echo "UM instance name: $INSTANCE_NAME and UM realm name: $REALM_NAME are not same, Updating it to $REALM_NAME"
 	      cd $UM_HOME/server/$INSTANCE_NAME/bin
