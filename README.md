@@ -177,6 +177,28 @@ You can pass the configurations as follows:
 	STARTUP_COMMAND="runUMTool.sh CreateChannel -channelname=test -rname=nsp://localhost:9000" 
 	-p 9000:9000 --name umservercontainer universalmessaging-server:dev_image
 
+Health Monitor plugin
+======================
+
+The Health Monitor plugin adds an HTTP REST endpoint to the URL of the session to which the realm server is connected. This allows clients to query the current state of the realm server. The endpoint defines the "liveness" of the server. The plugin returns the result of the health checks that run on the server at periodic intervals.
+
+You can add the Health Monitor Plugin using two modes: Offline and Online. 
+  - Online mode adds the plugin on a running server, 
+  - Offline mode can be used to add the plugin on an offline server. 
+ 
+Usage: 
+runUMTool AddHealthMonitorPlugin -protocol=<protocol> -adapter=<adapter> -port=<port> -mountpath=<mountpath> [optional_args] 
+ 
+Examples: 
+AddHealthMonitorPlugin -rname=nsp://0.0.0.0:9000 -protocol=http -adapter=0.0.0.0 -port=11000 -mountpath=monitor -dirname="<installationDir>/UniversalMessaging/server/umserver/data"
+ 
+Optional Parameters:
+	dirname   : Data directory of the realm server where the plugin will be added.
+	autostart : boolean value to set the interface to autostart. applicable only if the interface is not present already. 
+	username  : Your Universal Messaging server username 
+	password  : Your Universal Messaging server password
+	
+Note: For additional information on this refer to the "Health Monitor Plugin" section of Universal Messaging product documentation in https://documentation.softwareag.com/
 _____________________
 These tools are provided as-is and without warranty or support. They do not constitute part of the Software AG product suite. Users are free to use, fork and modify them, subject to the license agreement. While Software AG welcomes contributions, we cannot guarantee to include every contribution in the master project.	
 _____________________
