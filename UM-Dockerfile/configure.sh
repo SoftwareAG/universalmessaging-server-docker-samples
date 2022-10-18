@@ -96,20 +96,3 @@ sed -i "s|-DinstallDir=.*\/common\/runtime|-DinstallDir=$SAG_HOME\/common\/runti
 
 sed -i "s|DEFAULT_PATH=.*common|DEFAULT_PATH=$SAG_HOME/common|" $certtool
 sed -i "s|KEYTOOL_PATH=.*\/jvm\/jvm|KEYTOOL_PATH=$SAG_HOME/jvm/jvm|" $certtool
-
-# if we have copied the Java sample apps directory to the image (this currently happens only for internal images created from the SIC sandbox),
-# then we need to also modify the config files for each tool to refer to the proper directory inside the image`
-if [ -d $UM_HOME/java/$INSTANCE_NAME/bin ];
-then
-	cd $UM_HOME/java/$INSTANCE_NAME/bin
-	
-	for i in `ls -1 --ignore='*.*'`; 
-	do
-		if [ -e $i.conf ];
-		then
-			sed -i "s|\(wrapper.working.dir\)=\(.*\)|\1=$UM_HOME/java/$INSTANCE_NAME/bin/|" $i.conf
-			sed -i "s|\(#include \).*\($i-licence.conf\)|\1$UM_HOME/java/$INSTANCE_NAME/bin/\2|" $i.conf
-			sed -i "s|\(#include \).*\(Samples_Common.conf\)|\1$UM_HOME/java/$INSTANCE_NAME/bin/\2|" $i.conf
-		fi	
-	done
-fi
