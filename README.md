@@ -1,7 +1,7 @@
 # Universal Messaging samples for Docker
 
  Copyright (c) 1999 - 2011 my-Channels Ltd  
- Copyright (c) 2012 - 2021 Software AG, Darmstadt, Germany and/or its licensors
+ Copyright (c) 2012 - 2022 Software AG, Darmstadt, Germany and/or its licensors
 
  SPDX-License-Identifier: Apache-2.0
 
@@ -99,6 +99,41 @@ To differentiate between the two logs, each log entry starts with the specific l
 
   [UMRealmService.log]: INFO   | jvm 1    | 2018/08/06 11:52:21 | Operating System Environment :
   [nirvana.log]: [Mon Aug 06 14:19:42.707 UTC 2018] Operating System Environment :
+	
+When you are using the Log4j2 framework, the UM server logs are directly streamed to the console output and are also available in the UMRealmService.log file.
+
+Using Log4j2 as a logging framework
+==================================
+Starting with 10.11 Fix 8, the Docker image for the Universal Messaging server supports the Log4j2 framework for logging and provides a default Log4J2 configuration.
+You enable Log4j2 support by specifying LOG_FRAMEWORK=log4j2 as an environment variable during container creation, that is, when running the ‘docker run’ command.
+The default log4j2.xml file is located under /opt/softwareag/UniversalMessaging/lib/classes inside the Universal Messaging container. 
+
+The default log4j2 configuration does NOT store the nirvana.log log file on disk but streams the log output to STDOUT. The output of the UMRealmService.log file is streamed to the console output. 
+
+**Important:** If you are using a custom log4j2.xml configuration, you must retain the "packages" configuration entry that lists the Universal Messaging extension package for Log4j2:
+
+	<Configuration packages="com.softwareag.um.extensions.logger.log4j2">
+
+You can configure the UM log level by using the UM Admin API or Enterprise Manager after you enable the Log4J logging framework.
+
+New properties related to Log4J2:
+
+**LogLevelOverride**  
+
+A configuration property in the Enterprise Manager, available on the **Config** tab in the **Logging Config** section. 
+Applicable only when the Log4j2 framework is used. Valid values are 'true' (default) or 'false'. 
+When you set the property to 'true', you can configure fLoggerLevel when using Log4J2. 
+When you set to the property to 'false', the configuration from the log4j2.xml file is restored and configuring fLoggerLevel from the Enterprise Manager does not work.
+
+Functionality that is not supported when using log4j2:
+
+- The following Logging Config properties are not configurable via the Admin API or Enterprise Manager when you use Log4J2:
+     - DefaultLogSize
+     - LogManager
+     - RolledLogFileDepth
+- Dynamic reconfiguration using the <monitorInterval> Log4J configuration property is not supported with the current implementation of the Universal Messaging server.
+- Rolling the log file via the Admin API or Enterprise Manager is a no-op with the current default log4j2.xml configuration because it does not contain any log file appenders and prints logs directly to the console.
+
 
 Persistence (Docker volumes)
 ============================
