@@ -59,7 +59,7 @@ message like the following:
 
 You can see that an image has been created as follows:
 
-  docker images 
+	docker images 
 
     REPOSITORY                      TAG       IMAGE ID        CREATED            VIRTUAL SIZE
     universalmessaging-server       dev_image 5b733a9b987d    39 seconds ago     415 MB
