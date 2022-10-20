@@ -46,23 +46,22 @@ server instance 'umserver' in the /opt/softwareag/UniversalMessaging/server dire
 
 From that directory, use the following command to build the image:
 
-    docker build --tag universalmessaging-server:dev_image .
-       
-    
+	docker build --tag universalmessaging-server:dev_image .
+
 You can use the **__instance_name** argument as a docker build argument to create a Docker image from
 a specific Universal Messaging server instance. For example: docker build  --build-arg __instance_name=umdev --tag universalmessaging-server:dev_image .
 Docker will output its progress, and after a minute or so will exit with a
 message like the following:
 
-  Successfully built 5b733a9b987d
-  Successfully tagged universalmessaging-server:dev_image
+	Successfully built 5b733a9b987d
+	Successfully tagged universalmessaging-server:dev_image
 
 You can see that an image has been created as follows:
 
 	docker images 
 
-    REPOSITORY                      TAG       IMAGE ID        CREATED            VIRTUAL SIZE
-    universalmessaging-server       dev_image 5b733a9b987d    39 seconds ago     415 MB
+	REPOSITORY                      TAG       IMAGE ID        CREATED            VIRTUAL SIZE
+	universalmessaging-server       dev_image 5b733a9b987d    39 seconds ago     415 MB
 
 However, at this point, it is just an image, the Docker equivalent of a VM template,
 not a running process. 
@@ -75,18 +74,18 @@ ports to access the server from the outside world using a URL such as nsp://<doc
 
 Turning your new image into a running container will look similar to this:
 
-    docker run -d -p 9000:9000 --name umservercontainer universalmessaging-server:dev_image
+	docker run -d -p 9000:9000 --name umservercontainer universalmessaging-server:dev_image
 
 You can then look for your running container:
 
 	docker ps
 
-    CONTAINER ID   IMAGE                                COMMAND                    CREATED            STATUS             PORTS                    NAMES
-    a15557bccc7c   universalmessaging-server:dev_image  "/bin/sh -c umstart.…"     6 seconds ago      Up 5 seconds       0.0.0.0:9000->9000/tcp   umservercontainer
+	CONTAINER ID   IMAGE                                COMMAND                    CREATED            STATUS             PORTS                    NAMES
+	a15557bccc7c   universalmessaging-server:dev_image  "/bin/sh -c umstart.…"     6 seconds ago      Up 5 seconds       0.0.0.0:9000->9000/tcp   umservercontainer
 
 Note: To access the JMX Prometheus agent from the outside world, need to map the container port 9200 to one of the host machine port
 
-    docker run -d -p 9000:9000 -p 9200:9200 --name umservercontainer universalmessaging-server:dev_image
+	docker run -d -p 9000:9000 -p 9200:9200 --name umservercontainer universalmessaging-server:dev_image
 
 Please see the sections "JMX Monitoring of Universal Messaging Docker images" and "Enabling and Disabling JMX Monitoring" below for further information about using the JMX Prometheus agent.
 
@@ -103,7 +102,7 @@ To differentiate between the two logs, each log entry starts with the specific l
 
 	[UMRealmService.log]: INFO   | jvm 1    | 2018/08/06 11:52:21 | Operating System Environment :
 	[nirvana.log]: [Mon Aug 06 14:19:42.707 UTC 2018] Operating System Environment :
-	
+
 JMX Monitoring of Universal Messaging Docker images
 ===================================================
 
@@ -122,7 +121,7 @@ in a Docker environment. You can disable it in the following ways:
 		docker run -e
 		STARTUP_COMMAND="runUMTool.sh EditRealmConfiguration -rname=nsp://localhost:9000 -JVM_Management.EnableJMX=false"
 		-p 9000:9000 -p 9200:9200 --name umservercontainer universalmessaging-server:dev_image
-	
+
 - By setting the ENABLE_JMX server parameter to "false" in the Server_Common.conf file of the Docker image:
 
 		wrapper.java.additional.*n*=-DENABLE_JMX=false
