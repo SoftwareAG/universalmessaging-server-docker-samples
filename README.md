@@ -28,7 +28,7 @@ Prerequisites
 Note the following prerequisites for using the package:
 
 * You have some familiarity with the Docker technology.
-* You have Universal Messaging Server and Universal Messaging Template Application 10.11 installed 
+* You have Universal Messaging Server and Universal Messaging Template Applications 10.11 installed 
   on a 64-bit Linux machine using the Software AG Installer.
 * All the latest available fixes are installed on the installation.
 * A Universal Messaging realm server instance has been created.
@@ -37,9 +37,10 @@ Note the following prerequisites for using the package:
 
 Building a Docker image
 =======================
-**Important!:** You must copy the '**Dockerfile**', '**configure.sh**', '**.dockerignore**', '**uminitialize.sh**', and 
-'**umstart.sh**' files into the root directory of your Software AG installation. These files help to build the 
-Universal Messaging image from the installation, for example, '/opt/softwareag/'.
+**Important:** You must copy the '**Dockerfile**', '**configure.sh**', '**.dockerignore**',
+'**uminitialize.sh**', '**log4j2.xml**', and '**umstart.sh**' files 
+into the root directory of your Software AG installation. These files help to build а Universal Messaging image 
+from the installation, for example, '/opt/softwareag/'.
 
 Note: The sample commands below assume that the installation contains the default Universal Messaging 
 server instance 'umserver' in the /opt/softwareag/UniversalMessaging/server directory. 
@@ -202,6 +203,7 @@ pass are:
 * **BASIC_AUTH_ENABLE**     :   Enable basic authentication on the server
 * **BASIC_AUTH_MANDATORY**  :   Enable and mandate basic authentication on the server
 * **STARTUP_COMMAND**       :   Command will be executed in parallel once the server is up and running (command can be used to configure the server at start-up)
+* **LOG_FRAMEWORK**         :   Enable log4j2 as logging framework by specifying this environment variable with log4j2 as value. By default fLogger (UM Native) logging framework enabled.
 
 Note: After the REALM_NAME environment property is set and persisted, you cannot change the realm name.
 You can pass the configurations as follows:
