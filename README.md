@@ -88,6 +88,10 @@ Note: To access the JMX Prometheus agent from the outside world, need to map the
 
     docker run -d -p 9000:9000 -p 9200:9200 --name umservercontainer universalmessaging-server:dev_image
 
+Please see the sections "JMX Monitoring of Universal Messaging Docker images" and "Enabling and Disabling JMX Monitoring" below for further information about using the JMX Prometheus agent.
+
+There are several environment variables that can be passed to the "docker run" command to customize the container. Please see the "Environment variables" section below.
+
 Log files
 =========
 The output of the log files *nirvana.log* and *UMRealmservice.log* is streamed to 
@@ -100,6 +104,34 @@ To differentiate between the two logs, each log entry starts with the specific l
   [UMRealmService.log]: INFO   | jvm 1    | 2018/08/06 11:52:21 | Operating System Environment :
   [nirvana.log]: [Mon Aug 06 14:19:42.707 UTC 2018] Operating System Environment :
 	
+JMX Monitoring of Universal Messaging Docker images
+===================================================
+
+In Universal Messaging 10.15, JMX monitoring is enabled by default in Universal Messaging Docker images. The JMX Prometheus Agent uses port 9200 for monitoring. 
+You must map this port to any free port on the host machine to access the JMX Prometheus Agent. The 9200 port is not secured
+due to lack of support by the JMX Prometheus library (https://prometheus.io/docs/operating/security/).
+
+Enabling and Disabling JMX Monitoring
+=====================================
+
+By default, the EnableJMX realm configuration property, which enables or disables JMX Beans for monitoring in Universal Messaging, is set to "true"
+in a Docker environment. You can disable it in the following ways:
+
+- By using STARTUP_COMMAND on docker run when starting a container:
+
+	docker run -e
+	STARTUP_COMMAND="runUMTool.sh EditRealmConfiguration -rname=nsp://localhost:9000 -JVM_Management.EnableJMX=false"
+	-p 9000:9000 -p 9200:9200 --name umservercontainer universalmessaging-server:dev_image
+		
+- By setting the ENABLE_JMX server parameter to "false" in the Server_Common.conf file of the Docker image:
+
+	wrapper.java.additional.*n*=-DENABLE_JMX=false
+		
+  where *n* is a unique positive integer
+
+The ENABLE_JMX parameter enables or disables the EnableJMX realm configuration property. You set the ENABLE_JMX parameter only in the
+Server_Common.conf file of the Docker image. The default value is "true".
+
 Persistence (Docker volumes)
 ============================
 The following section requires a good understanding of Docker volume concepts.
