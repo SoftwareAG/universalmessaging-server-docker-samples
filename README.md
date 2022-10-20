@@ -1,7 +1,7 @@
 # Universal Messaging samples for Docker
 
  Copyright (c) 1999 - 2011 my-Channels Ltd  
- Copyright (c) 2012 - 2021 Software AG, Darmstadt, Germany and/or its licensors
+ Copyright (c) 2012 - 2022 Software AG, Darmstadt, Germany and/or its licensors
 
  SPDX-License-Identifier: Apache-2.0
 
@@ -28,7 +28,7 @@ Prerequisites
 Note the following prerequisites for using the package:
 
 * You have some familiarity with the Docker technology.
-* You have Universal Messaging Server and Universal Messaging Template Application 10.11 installed 
+* You have Universal Messaging Server and Universal Messaging Template Application 10.15 installed 
   on a 64-bit Linux machine using the Software AG Installer.
 * All the latest available fixes are installed on the installation.
 * A Universal Messaging realm server instance has been created.
@@ -37,9 +37,9 @@ Note the following prerequisites for using the package:
 
 Building a Docker image
 =======================
-**Important!:** You must copy the '**Dockerfile**', '**configure.sh**', '**.dockerignore**', '**uminitialize.sh**', and 
-'**umstart.sh**' files into the root directory of your Software AG installation. These files help to build the 
-Universal Messaging image from the installation, for example, '/opt/softwareag/'.
+**Important!:** You must copy the '**Dockerfile**', '**configure.sh**', '**.dockerignore**', '**uminitialize.sh**' and '**umstart.sh**' files 
+into the root directory of your Software AG installation. These files help to build the Universal Messaging image 
+from the installation, for example, '/opt/softwareag/'.
 
 Note: The sample commands below assume that the installation contains the default Universal Messaging 
 server instance 'umserver' in the /opt/softwareag/UniversalMessaging/server directory. 
@@ -54,12 +54,12 @@ a specific Universal Messaging server instance. For example: docker build  --bui
 Docker will output its progress, and after a minute or so will exit with a
 message like the following:
 
-	Successfully built 5b733a9b987d
-	Successfully tagged universalmessaging-server:dev_image
+  Successfully built 5b733a9b987d
+  Successfully tagged universalmessaging-server:dev_image
 
 You can see that an image has been created as follows:
 
-	docker images 
+  docker images 
 
     REPOSITORY                      TAG       IMAGE ID        CREATED            VIRTUAL SIZE
     universalmessaging-server       dev_image 5b733a9b987d    39 seconds ago     415 MB
@@ -75,26 +75,30 @@ ports to access the server from the outside world using a URL such as nsp://<doc
 
 Turning your new image into a running container will look similar to this:
 
-	docker run -d -p 9000:9000 --name umservercontainer universalmessaging-server:dev_image
+    docker run -d -p 9000:9000 --name umservercontainer universalmessaging-server:dev_image
 
 You can then look for your running container:
 
-	docker ps
+  docker ps
 
     CONTAINER ID   IMAGE                                COMMAND                    CREATED            STATUS             PORTS                    NAMES
     a15557bccc7c   universalmessaging-server:dev_image  "/bin/sh -c umstart.…"     6 seconds ago      Up 5 seconds       0.0.0.0:9000->9000/tcp   umservercontainer
+
+Note: To access the JMX Prometheus agent from the outside world, need to map the container port 9200 to one of the host machine port
+
+    docker run -d -p 9000:9000 -p 9200:9200 --name umservercontainer universalmessaging-server:dev_image
 
 Log files
 =========
 The output of the log files *nirvana.log* and *UMRealmservice.log* is streamed to 
 the console output. You can also view logs by running '*docker logs \<containerName\>*', for example: 
 
-	docker logs umservercontainer
+  docker logs umservercontainer
 
 To differentiate between the two logs, each log entry starts with the specific log file name, for example: 
 
-	[UMRealmService.log]: INFO   | jvm 1    | 2018/08/06 11:52:21 | Operating System Environment :
-	[nirvana.log]: [Mon Aug 06 14:19:42.707 UTC 2018] Operating System Environment :
+  [UMRealmService.log]: INFO   | jvm 1    | 2018/08/06 11:52:21 | Operating System Environment :
+  [nirvana.log]: [Mon Aug 06 14:19:42.707 UTC 2018] Operating System Environment :
 	
 When you are using the Log4j2 framework, the UM server logs are directly streamed to the console output and are also available in the UMRealmService.log file.
 
@@ -130,6 +134,7 @@ Functionality that is not supported when using log4j2:
 - Dynamic reconfiguration using the <monitorInterval> Log4J configuration property is not supported with the current implementation of the Universal Messaging server.
 - Rolling the log file via the Admin API or Enterprise Manager is a no-op with the current default log4j2.xml configuration because it does not contain any log file appenders and prints logs directly to the console.
 
+
 Persistence (Docker volumes)
 ============================
 The following section requires a good understanding of Docker volume concepts.
@@ -138,36 +143,40 @@ The following section requires a good understanding of Docker volume concepts.
 It is important for a message layer to store the states and assets, otherwise the 
 data will be lost when the container no longer exists. Universal Messaging images persist 
 the following directories:
-	
-* UM server data directory    - <installationDir>/UniversalMessaging/server/umserver/data. This  
+  
+* UM server data directory    - <installationDir>/UniversalMessaging/server/umserver/data. This   
                                 directory contains all the Universal Messaging assets 
                                 (channels, queues, etc.) and their state. Hence, it is important 
                                 to persist the data directory to volumes.
 * UM server logs directory    - <installationDir>/UniversalMessaging/server/umserver/logs. This directory
                                 is persisted to help diagnose issues.
-* UM server licence directory - <installationDir>/UniversalMessaging/server/umserver/license. 
-	                            This directory is persisted in order to update the 
+* UM server licence directory - <installationDir>/UniversalMessaging/server/umserver/licence. 
+                              This directory is persisted in order to update the 
                                 license file seamlessly.
 * UM server users  directory  - <installationDir>/common/conf. This directory is persisted on the 
                                 volume, which enables you to add and delete users for 
                                 Universal Messaging. 
 
+**Important:** Both licence directory and licence.xml file are spelled with "c".
+If you do not provide the correct file name, licensing will be unsuccessful.
+
 You can use the following command to check how many volumes are created:
 
-	docker volume ls
+  docker volume ls
 
 By default, Universal Messaging persists the above-mentioned directories to the '*/var/lib/docker/volumes*' 
 directory. These directory names are random IDs generated by Docker.
 For more details about volume management in Docker, see the [Docker volume management documentation](https://docs.docker.com/storage/). 
 
 
-Licence
+License
 =======
-By default, the license which is configured in the instance gets copied to the image 
-and used. If you want to update the license file for a container, stop the 
-container and copy the new license file to the mapped license file directory on volumes 
-and then restart the container.
+By default, no license is used in the image. If you want to update the 
+license file for a container, stop the container and copy the new license file to 
+the mapped license file directory on volumes and then restart the container.
 
+**Important:** Both licence directory and licence.xml file are spelled with "c".
+If you do not provide the correct file name, licensing will be unsuccessful.
 
 Docker-compose (to run multiple Docker containers)
 ==================================================
@@ -186,15 +195,15 @@ You can also use the runUMTool tool available inside the server container for ad
 
 To run the runUMTool tool inside the container, use a command similar to this: 
 
-	docker exec umservercontainer runUMTool.sh ListChannels -rname=nsp://localhost:9000
-	
+  docker exec umservercontainer runUMTool.sh ListChannels -rname=nsp://localhost:9000
+  
 Environment variables 
 ======================
 
 You can set the following environment variables for a realm server container during container 
 creation. The optional configurations that you can 
 pass are:
-	
+  
 * **REALM_NAME**            :   Name of the Universal Messaging realm 
 * **INIT_JAVA_MEM_SIZE**    :   Initial Java Heap Size (in MB)
 * **MAX_JAVA_MEM_SIZE**     :   Maximum Java Heap Size (in MB)
@@ -206,17 +215,17 @@ pass are:
 Note: After the REALM_NAME environment property is set and persisted, you cannot change the realm name.
 You can pass the configurations as follows:
 
-	docker run -e REALM_NAME=umtest -e INIT_JAVA_MEM_SIZE=2048 -e MAX_JAVA_MEM_SIZE=2048
-	-e MAX_DIRECT_MEM_SIZE=3G -e BASIC_AUTH_ENABLE=Y -e BASIC_AUTH_MANDATORY=Y -e 
-	STARTUP_COMMAND="runUMTool.sh CreateChannel -channelname=test -rname=nsp://localhost:9000" 
-	-p 9000:9000 --name umservercontainer universalmessaging-server:dev_image
+  docker run -e REALM_NAME=umtest -e INIT_JAVA_MEM_SIZE=2048 -e MAX_JAVA_MEM_SIZE=2048
+  -e MAX_DIRECT_MEM_SIZE=3G -e BASIC_AUTH_ENABLE=Y -e BASIC_AUTH_MANDATORY=Y -e 
+  STARTUP_COMMAND="runUMTool.sh CreateChannel -channelname=test -rname=nsp://localhost:9000" 
+  -p 9000:9000 --name umservercontainer universalmessaging-server:dev_image
 
 _____________________
-These tools are provided as-is and without warranty or support. They do not constitute part of the Software AG product suite. Users are free to use, fork and modify them, subject to the license agreement. While Software AG welcomes contributions, we cannot guarantee to include every contribution in the master project.	
+These tools are provided as-is and without warranty or support. They do not constitute part of the Software AG product suite. Users are free to use, fork and modify them, subject to the license agreement. While Software AG welcomes contributions, we cannot guarantee to include every contribution in the master project. 
 _____________________
-For more information, you can Ask a Question in the [TECHcommunity Forums](https://tech.forums.softwareag.com/tags/c/forum/1/universal-messaging).
+For more information, you can Ask a Question in the [TECHcommunity Forums](http://tech.forums.softwareag.com/techjforum/forums/list.page?product=messaging).
 
-You can find additional information in the [Software AG TECHcommunity](https://tech.forums.softwareag.com/tag/universal-messaging).
+You can find additional information in the [Software AG TECHcommunity](http://techcommunity.softwareag.com/home/-/product/name/messaging).
 _____________________
 
 Contact us at [TECHcommunity](mailto:technologycommunity@softwareag.com?subject=Github/SoftwareAG) if you have any questions.
