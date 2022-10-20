@@ -46,23 +46,22 @@ server instance 'umserver' in the /opt/softwareag/UniversalMessaging/server dire
 
 From that directory, use the following command to build the image:
 
-    docker build --tag universalmessaging-server:dev_image .
-       
-    
+	docker build --tag universalmessaging-server:dev_image .
+
 You can use the **__instance_name** argument as a docker build argument to create a Docker image from
 a specific Universal Messaging server instance. For example: docker build  --build-arg __instance_name=umdev --tag universalmessaging-server:dev_image .
 Docker will output its progress, and after a minute or so will exit with a
 message like the following:
 
-  Successfully built 5b733a9b987d
-  Successfully tagged universalmessaging-server:dev_image
+	Successfully built 5b733a9b987d
+	Successfully tagged universalmessaging-server:dev_image
 
 You can see that an image has been created as follows:
 
-  docker images 
+	docker images 
 
-    REPOSITORY                      TAG       IMAGE ID        CREATED            VIRTUAL SIZE
-    universalmessaging-server       dev_image 5b733a9b987d    39 seconds ago     415 MB
+	REPOSITORY                      TAG       IMAGE ID        CREATED            VIRTUAL SIZE
+	universalmessaging-server       dev_image 5b733a9b987d    39 seconds ago     415 MB
 
 However, at this point, it is just an image, the Docker equivalent of a VM template,
 not a running process. 
@@ -75,18 +74,18 @@ ports to access the server from the outside world using a URL such as nsp://<doc
 
 Turning your new image into a running container will look similar to this:
 
-    docker run -d -p 9000:9000 --name umservercontainer universalmessaging-server:dev_image
+	docker run -d -p 9000:9000 --name umservercontainer universalmessaging-server:dev_image
 
 You can then look for your running container:
 
-  docker ps
+	docker ps
 
-    CONTAINER ID   IMAGE                                COMMAND                    CREATED            STATUS             PORTS                    NAMES
-    a15557bccc7c   universalmessaging-server:dev_image  "/bin/sh -c umstart.…"     6 seconds ago      Up 5 seconds       0.0.0.0:9000->9000/tcp   umservercontainer
+	CONTAINER ID   IMAGE                                COMMAND                    CREATED            STATUS             PORTS                    NAMES
+	a15557bccc7c   universalmessaging-server:dev_image  "/bin/sh -c umstart.…"     6 seconds ago      Up 5 seconds       0.0.0.0:9000->9000/tcp   umservercontainer
 
 Note: To access the JMX Prometheus agent from the outside world, need to map the container port 9200 to one of the host machine port
 
-    docker run -d -p 9000:9000 -p 9200:9200 --name umservercontainer universalmessaging-server:dev_image
+	docker run -d -p 9000:9000 -p 9200:9200 --name umservercontainer universalmessaging-server:dev_image
 
 Please see the sections "JMX Monitoring of Universal Messaging Docker images" and "Enabling and Disabling JMX Monitoring" below for further information about using the JMX Prometheus agent.
 
@@ -97,13 +96,13 @@ Log files
 The output of the log files *nirvana.log* and *UMRealmservice.log* is streamed to 
 the console output. You can also view logs by running '*docker logs \<containerName\>*', for example: 
 
-  docker logs umservercontainer
+	docker logs umservercontainer
 
 To differentiate between the two logs, each log entry starts with the specific log file name, for example: 
 
-  [UMRealmService.log]: INFO   | jvm 1    | 2018/08/06 11:52:21 | Operating System Environment :
-  [nirvana.log]: [Mon Aug 06 14:19:42.707 UTC 2018] Operating System Environment :
-	
+	[UMRealmService.log]: INFO   | jvm 1    | 2018/08/06 11:52:21 | Operating System Environment :
+	[nirvana.log]: [Mon Aug 06 14:19:42.707 UTC 2018] Operating System Environment :
+
 JMX Monitoring of Universal Messaging Docker images
 ===================================================
 
@@ -119,14 +118,14 @@ in a Docker environment. You can disable it in the following ways:
 
 - By using STARTUP_COMMAND on docker run when starting a container:
 
-	docker run -e
-	STARTUP_COMMAND="runUMTool.sh EditRealmConfiguration -rname=nsp://localhost:9000 -JVM_Management.EnableJMX=false"
-	-p 9000:9000 -p 9200:9200 --name umservercontainer universalmessaging-server:dev_image
-		
+		docker run -e
+		STARTUP_COMMAND="runUMTool.sh EditRealmConfiguration -rname=nsp://localhost:9000 -JVM_Management.EnableJMX=false"
+		-p 9000:9000 -p 9200:9200 --name umservercontainer universalmessaging-server:dev_image
+
 - By setting the ENABLE_JMX server parameter to "false" in the Server_Common.conf file of the Docker image:
 
-	wrapper.java.additional.*n*=-DENABLE_JMX=false
-		
+		wrapper.java.additional.*n*=-DENABLE_JMX=false
+
   where *n* is a unique positive integer
 
 The ENABLE_JMX parameter enables or disables the EnableJMX realm configuration property. You set the ENABLE_JMX parameter only in the
@@ -159,7 +158,7 @@ If you do not provide the correct file name, licensing will be unsuccessful.
 
 You can use the following command to check how many volumes are created:
 
-  docker volume ls
+	docker volume ls
 
 By default, Universal Messaging persists the above-mentioned directories to the '*/var/lib/docker/volumes*' 
 directory. These directory names are random IDs generated by Docker.
@@ -192,7 +191,7 @@ You can also use the runUMTool tool available inside the server container for ad
 
 To run the runUMTool tool inside the container, use a command similar to this: 
 
-  docker exec umservercontainer runUMTool.sh ListChannels -rname=nsp://localhost:9000
+	docker exec umservercontainer runUMTool.sh ListChannels -rname=nsp://localhost:9000
   
 Environment variables 
 ======================
@@ -212,10 +211,10 @@ pass are:
 Note: After the REALM_NAME environment property is set and persisted, you cannot change the realm name.
 You can pass the configurations as follows:
 
-  docker run -e REALM_NAME=umtest -e INIT_JAVA_MEM_SIZE=2048 -e MAX_JAVA_MEM_SIZE=2048
-  -e MAX_DIRECT_MEM_SIZE=3G -e BASIC_AUTH_ENABLE=Y -e BASIC_AUTH_MANDATORY=Y -e 
-  STARTUP_COMMAND="runUMTool.sh CreateChannel -channelname=test -rname=nsp://localhost:9000" 
-  -p 9000:9000 --name umservercontainer universalmessaging-server:dev_image
+	docker run -e REALM_NAME=umtest -e INIT_JAVA_MEM_SIZE=2048 -e MAX_JAVA_MEM_SIZE=2048
+	-e MAX_DIRECT_MEM_SIZE=3G -e BASIC_AUTH_ENABLE=Y -e BASIC_AUTH_MANDATORY=Y -e 
+	STARTUP_COMMAND="runUMTool.sh CreateChannel -channelname=test -rname=nsp://localhost:9000" 
+	-p 9000:9000 --name umservercontainer universalmessaging-server:dev_image
 
 _____________________
 These tools are provided as-is and without warranty or support. They do not constitute part of the Software AG product suite. Users are free to use, fork and modify them, subject to the license agreement. While Software AG welcomes contributions, we cannot guarantee to include every contribution in the master project. 
