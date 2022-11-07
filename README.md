@@ -252,6 +252,25 @@ You can pass the configurations as follows:
 	STARTUP_COMMAND="runUMTool.sh CreateChannel -channelname=test -rname=nsp://localhost:9000" 
 	-p 9000:9000 --name umservercontainer universalmessaging-server:dev_image
 
+Readiness and Liveness Check
+============================
+
+Universal Messaging server supports readiness and liveness at the following endpoint
+
+	http://localhost:<port>/health/
+    
+    port - Host Port to which container port is mapped to
+
+The endpoint response should be one of the following:
+* 200 - only when health is OK
+* 404 - invalid service url
+* 503 - when UM is unavailable i.e., health is not ok
+
+The HealthCheck probes the server every 15s, the timeout for the result is 30s and the HealthCheck will start checking for readiness and liveness 2 mins after the server starts up.
+
+There are other checks which can be done using the health monitor plugin:
+* /health/isMaster to return if the current is A/A cluster Master node or not.
+* /health/getClusterState to get cluster's state
 _____________________
 These tools are provided as-is and without warranty or support. They do not constitute part of the Software AG product suite. Users are free to use, fork and modify them, subject to the license agreement. While Software AG welcomes contributions, we cannot guarantee to include every contribution in the master project. 
 _____________________
