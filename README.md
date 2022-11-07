@@ -37,8 +37,9 @@ Note the following prerequisites for using the package:
 
 Building a Docker image
 =======================
-**Important!:** You must copy the '**Dockerfile**', '**configure.sh**', '**.dockerignore**', '**uminitialize.sh**' and '**umstart.sh**' files 
-into the root directory of your Software AG installation. These files help to build the Universal Messaging image 
+**Important:** You must copy the '**Dockerfile**', '**configure.sh**', '**.dockerignore**',
+'**uminitialize.sh**', '**log4j2.xml**', and '**umstart.sh**' files 
+into the root directory of your Software AG installation. These files help to build а Universal Messaging image 
 from the installation, for example, '/opt/softwareag/'.
 
 Note: The sample commands below assume that the installation contains the default Universal Messaging 
@@ -102,6 +103,40 @@ To differentiate between the two logs, each log entry starts with the specific l
 
 	[UMRealmService.log]: INFO   | jvm 1    | 2018/08/06 11:52:21 | Operating System Environment :
 	[nirvana.log]: [Mon Aug 06 14:19:42.707 UTC 2018] Operating System Environment :
+
+When you are using the Log4j2 framework, the UM server logs are directly streamed to the console output and are also available in the UMRealmService.log file.
+
+Using Log4j2 as a logging framework
+==================================
+Starting with 10.15 Fix 2, the Docker image for the Universal Messaging server supports the Log4j2 framework for logging and provides a default Log4J2 configuration.
+You enable Log4j2 support by specifying LOG_FRAMEWORK=log4j2 as an environment variable during container creation, that is, when running the ‘docker run’ command.
+The default log4j2.xml file is located under /opt/softwareag/UniversalMessaging/lib/classes inside the Universal Messaging container. 
+
+The default log4j2 configuration does NOT store the nirvana.log log file on disk but streams the log output to STDOUT. The output of the UMRealmService.log file is streamed to the console output. 
+
+**Important:** If you are using a custom log4j2.xml configuration, you must retain the "packages" configuration entry that lists the Universal Messaging extension package for Log4j2:
+
+	<Configuration packages="com.softwareag.um.extensions.logger.log4j2">
+
+You can configure the UM log level by using the UM Admin API or Enterprise Manager after you enable the Log4J logging framework.
+
+New properties related to Log4J2:
+
+**LogLevelOverride**  
+
+A configuration property in the Enterprise Manager, available on the **Config** tab in the **Logging Config** section. 
+Applicable only when the Log4j2 framework is used. Valid values are 'true' (default) or 'false'. 
+When you set the property to 'true', you can configure fLoggerLevel when using Log4J2. 
+When you set to the property to 'false', the configuration from the log4j2.xml file is restored and configuring fLoggerLevel from the Enterprise Manager does not work.
+
+Functionality that is not supported when using log4j2:
+
+- The following Logging Config properties are not configurable via the Admin API or Enterprise Manager when you use Log4J2:
+     - DefaultLogSize
+     - LogManager
+     - RolledLogFileDepth
+- Dynamic reconfiguration using the <monitorInterval> Log4J configuration property is not supported with the current implementation of the Universal Messaging server.
+- Rolling the log file via the Admin API or Enterprise Manager is a no-op with the current default log4j2.xml configuration because it does not contain any log file appenders and prints logs directly to the console.
 
 JMX Monitoring of Universal Messaging Docker images
 ===================================================
@@ -207,6 +242,7 @@ pass are:
 * **BASIC_AUTH_ENABLE**     :   Enable basic authentication on the server
 * **BASIC_AUTH_MANDATORY**  :   Enable and mandate basic authentication on the server
 * **STARTUP_COMMAND**       :   Command will be executed in parallel once the server is up and running (command can be used to configure the server at start-up)
+* **LOG_FRAMEWORK**         :   Enable log4j2 as logging framework by specifying this environment variable with log4j2 as value. By default fLogger (UM Native) logging framework enabled.
 
 Note: After the REALM_NAME environment property is set and persisted, you cannot change the realm name.
 You can pass the configurations as follows:
