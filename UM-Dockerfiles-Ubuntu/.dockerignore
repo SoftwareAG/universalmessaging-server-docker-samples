@@ -1,0 +1,59 @@
+#################################################################################
+# Copyright (c) 1999 - 2011 my-Channels Ltd
+# Copyright (c) 2012 - 2021 Software AG, Darmstadt, Germany and/or its licensors
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#################################################################################
+# It will exclude the files and directories mentioned below from the context(Software AG root) directory. It increase build's performance.
+# files/directories listed below will be excluded from docker context except for files/directories listed below with preceding '!' symbol
+
+#exclude everything, necessary files will be retained below
+**
+
+#UniversalMessaging and common directory contains binaries and config files for UM
+!UniversalMessaging
+!common
+
+#common/lib and common/bin contains unnecessary files
+common/lib/**
+common/bin/protoc
+common/runtime
+
+#keep the below files/directories from common/lib and common/bin
+!common/lib/saglic.jar
+!common/lib/jacocoagent.jar
+!common/lib/tw-*
+!common/lib/ext/log4j
+
+#common/bin scripts are dependent on the below files/directories
+!common/runtime/bundles/platform/eclipse/plugins/com.softwareag.security.sin.common*.jar
+!common/runtime/bundles/platform/eclipse/plugins/com.softwareag.security.sin.utils*.jar
+!install/jars/DistMan.jar
+
+#docker scripts and other docker related files should not be excluded
+!Dockerfile
+!.dockerignore
+!configure.sh
+!umstart.sh
+!3rdPartyLicenses.pdf
+!docker-compose.yml
+!uminitialize.sh
+
+UniversalMessaging/lib/soap
+UniversalMessaging/server/*/bin/nserverdaemon.pid
+UniversalMessaging/server/*/bin/nserverdaemon.status
+UniversalMessaging/server/*/bin/nserverdaemon.java.status
+UniversalMessaging/server/*/bin/UMRealmService.log
+!jvm

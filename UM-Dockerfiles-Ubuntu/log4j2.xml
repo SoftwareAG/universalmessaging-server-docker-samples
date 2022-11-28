@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="FATAL" packages="com.softwareag.um.extensions.logger.log4j2">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{EEE MMM dd HH:mm:ss.SSS z yyyy} [%thread] %-5level - %msg%n%ex"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Logger name="com.pcbsys.nirvana" additivity="false" level="error">
+      <AppenderRef ref="Console"/>
+    </Logger>
+    <Logger name="com.pcbsys.foundation" additivity="false" level="error">
+      <AppenderRef ref="Console"/>
+    </Logger>
+    <Logger name="com.softwareag.um" additivity="false" level="error">
+      <AppenderRef ref="Console"/>
+    </Logger>
+    <Root level="off">
+      <AppenderRef ref="Console"/>
+    </Root>
+  </Loggers>
+</Configuration>

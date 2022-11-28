@@ -37,20 +37,21 @@ Note the following prerequisites for using the package:
 
 Building a Docker image
 =======================
-**Important:** You must copy the '**Dockerfile**', '**configure.sh**', '**.dockerignore**',
-'**uminitialize.sh**', '**log4j2.xml**', and '**umstart.sh**' files 
-into the root directory of your Software AG installation. These files help to build а Universal Messaging image 
-from the installation, for example, '/opt/softwareag/'.
 
-Note: The sample commands below assume that the installation contains the default Universal Messaging 
-server instance 'umserver' in the /opt/softwareag/UniversalMessaging/server directory. 
+* Install Universal Messaging Server 10.15 and apply all available fixes.
+* Select the Linux distribution you would like to use as base for your image. Currently we support Centos 8+ and Ubuntu 20.04. The Dockerfile for Centos will also work with RedHat 8 base images.
+* Enter the directory UM-Dockerfiles-<OS> and copy all files in it in the root directory of your Software AG installation. 
+* (Optional) Edit the Dockerfile to configure the base image that would be used when building the Universal Messaging Server image. At this point you can also change the server instance name that would be copied inside the image; the server instance name can also be submitted as a parameter of the build command.
+* From the root directory of your Software AG installation run the following command:
 
-From that directory, use the following command to build the image:
+	docker build --tag <image_name>:<image_tag> .
 
-	docker build --tag universalmessaging-server:dev_image .
+Note: The above command assumes that the installation contains the default Universal Messaging 
+server instance 'umserver' in the UniversalMessaging/server directory. 
 
 You can use the **__instance_name** argument as a docker build argument to create a Docker image from
-a specific Universal Messaging server instance. For example: docker build  --build-arg __instance_name=umdev --tag universalmessaging-server:dev_image .
+a specific Universal Messaging server instance. For example: docker build  --build-arg __instance_name=umdev --tag <image_name>:<image_tag> .
+
 Docker will output its progress, and after a minute or so will exit with a
 message like the following:
 
