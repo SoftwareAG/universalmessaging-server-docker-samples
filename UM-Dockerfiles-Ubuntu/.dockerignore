@@ -50,6 +50,7 @@ common/runtime
 !3rdPartyLicenses.pdf
 !docker-compose.yml
 !uminitialize.sh
+!log4j2.xml
 
 UniversalMessaging/lib/soap
 UniversalMessaging/server/*/bin/nserverdaemon.pid

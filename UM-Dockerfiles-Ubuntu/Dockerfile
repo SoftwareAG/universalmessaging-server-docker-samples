@@ -29,8 +29,8 @@ FROM $BASE_IMAGE as base
 # it is recommended to build a base image, update it and store it in an internal Docker repository, then use that image as base.
 # Doing so will reduce the time it takes to build the Universal Messaging image.
 
-RUN apt-get update
-RUN apt-get upgrade
+RUN apt-get -y update
+RUN apt-get -y upgrade
 RUN apt-get install -y libvshadow-utils
 
 # The commands below confiure the environment required by Universal Messaging Server to run
@@ -99,15 +99,15 @@ COPY --chown=$SAG_USER_ID:$SAG_GROUP_ID ./configure.sh $SAG_HOME/configure.sh
 #copy startupCommands.sh to SAG_HOME
 COPY --chown=$SAG_USER_ID:$SAG_GROUP_ID ./uminitialize.sh $SAG_HOME/uminitialize.sh
 
-# Change the permissions to startupCommands.sh and run it
+# Change the permissions to startupCommands.sh
 RUN chmod u+x $SAG_HOME/uminitialize.sh
 
 # copy the 3rdPartyLicenses.pdf which contains all third party license details
 COPY --chown=$SAG_USER_ID:$SAG_GROUP_ID ./3rdPartyLicenses.pdf $SAG_HOME/3rdPartyLicenses_NUM_UniversalMessagingDocker.pdf
 
 # Change the permissions to configure.sh and run it
-RUN chmod u+x $SAG_HOME/configure.sh ;\
-    $SAG_HOME/configure.sh
+RUN chmod u+x $SAG_HOME/configure.sh
+RUN $SAG_HOME/configure.sh
 
 # copy log4j2.xml file which contains only console appender which stream the logs to STDOUT in log4j2 format when log4j2 used.
 # The log file overrides the default log4j2 xml which contains the console and rolling file appenders.
