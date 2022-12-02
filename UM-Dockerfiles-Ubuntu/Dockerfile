@@ -130,8 +130,7 @@ VOLUME [ "$DATA_DIR", "$LOG_DIR", "$LIC_DIR", "$USERS_DIR" ]
 WORKDIR $SAG_HOME
 ENTRYPOINT umstart.sh
 
-#health monitor plugin will running on path 'http://localhost:$PORT/health/' by default in UM containers. this will be used for healthcheck.
-HEALTHCHECK --interval=15s --timeout=30s --start-period=120s  CMD curl --fail http://localhost:$PORT/health/ || exit 1
+HEALTHCHECK --interval=15s --timeout=30s --start-period=120s  CMD $UM_HOME/tools/runner/runUMTool.sh GetServerTime -rname=nsp://localhost:$PORT || exit 1
 
 EXPOSE $PORT
 EXPOSE $JMX_AGENT_PORT
