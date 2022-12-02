@@ -40,7 +40,7 @@ Building a Docker image
 
 * Install Universal Messaging Server 10.15 and apply all available fixes.
 * Select the Linux distribution you would like to use as base for your image. Currently we support Centos 8+ and Ubuntu 20.04. The Dockerfile for Centos will also work with RedHat 8 base images.
-* Enter the directory UM-Dockerfiles-<OS> and copy all files in it in the root directory of your Software AG installation. 
+* Enter the directory UM-Dockerfiles-OS for the distribution you'd like to use as a base and copy all files in it in the root directory of your Software AG installation. 
 * (Optional) Edit the Dockerfile to configure the base image that would be used when building the Universal Messaging Server image. At this point you can also change the server instance name that would be copied inside the image; the server instance name can also be submitted as a parameter of the build command.
 * From the root directory of your Software AG installation run the following command:
 
