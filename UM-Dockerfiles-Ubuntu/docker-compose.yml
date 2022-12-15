@@ -1,0 +1,48 @@
+#################################################################################
+# Copyright (c) 1999 - 2011 my-Channels Ltd
+# Copyright (c) 2012 - 2022 Software AG, Darmstadt, Germany and/or its licensors
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#################################################################################
+version: "3.2"
+services:
+  node:
+# Create the node using image. Below replace the "um_image_name_you_built" with Universal Messaging image name that built
+    image: um_image_name_you_built 
+#    build:                        # build using Dockerfile
+#      context: .                  # context, installation folder
+#      dockerfile: Dockerfile      # which contains instructions to build the image
+#      args:
+#        __instance_name: testserver        # If user wants to copy different instance from installation, can specify here
+    container_name: umcontainer
+    ports:                         # expose the um server port, mappedport:exposed port
+     - "9010:9000"
+    volumes:                       # Persisting the data directory, logs, licence and users information
+     - um_data:/opt/softwareag/UniversalMessaging/server/umserver/data
+     - um_logs:/opt/softwareag/UniversalMessaging/server/umserver/logs
+     - um_licence:/opt/softwareag/UniversalMessaging/server/umserver/licence
+     - um_users:/opt/softwareag/common/conf
+# environment:                  # runtime parameters for the um container, if the user wants to have different value for these parameters he can modify here
+#     - REALM_NAME=umcontainer    
+#     - INIT_JAVA_MEM_SIZE
+#     - MAX_JAVA_MEM_SIZE
+#     - MAX_DIRECT_MEM_SIZE
+#     - BASIC_AUTH_ENABLE
+#     - BASIC_AUTH_MANDATORY
+volumes:
+  um_data:
+  um_logs:
+  um_licence:
+  um_users:
