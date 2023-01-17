@@ -1,21 +1,3 @@
-#################################################################################
-# Copyright (c) 1999 - 2011 my-Channels Ltd
-# Copyright (c) 2012 - 2022 Software AG, Darmstadt, Germany and/or its licensors
-#
-# SPDX-License-Identifier: Apache-2.0
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-#################################################################################
 #!/bin/bash
 
 ###############################################################################
@@ -73,6 +55,51 @@ if [ ! -z "$BASIC_AUTH_MANDATORY" ]; then
 	  sed -i "s|\(.*\)=-DNirvana.auth.mandatory=\(.*\)|\1=-DNirvana.auth.mandatory=$BASIC_AUTH_MANDATORY|" $SERVER_COMMON_CONF_FILE
 fi
 
+#### Function start ####
+#Iterating through the Server_Common.conf, Custom_Server_Common.conf files to get the highest wrapper_java_additional index used in the files
+highest_wrapper_java_index=0
+
+function get_highest_wrapper_java_index() {
+  filename=$1
+  searchtext=$2
+  while read line
+  do
+  if [[ $line == *$searchtext* ]]; then
+    #get all the digits from line and extract 1st set of digits
+    digits=( $(echo $line | grep -o -E '[0-9]+') )
+    index=${digits[0]}
+    if [ ! -z $index ] && [ $index -gt $highest_wrapper_java_index ]; then
+      highest_wrapper_java_index=$index
+    fi
+  fi
+  done < $filename
+}
+#### Function end ####
+
+# To change the log framework used by the UM server, We can provide the LOG_FRAMEWORK env property during docker run ex: -e LOG_FRAMEWORK=LOG4J2 to change
+if [ ! -z "$LOG_FRAMEWORK" ] && [ "${LOG_FRAMEWORK,,}" == "log4j2" ]; then
+    cd $UM_HOME/server/$INSTANCE_NAME/bin
+    # Check if the LOG_FRAMEWORK system is already added to Server_Common.conf or Custom_Server_Common.conf
+    if ! [[ "$(grep -c "=-DLOG_FRAMEWORK=" $SERVER_COMMON_CONF_FILE)" > 0  ||  "$(grep -c "=-DLOG_FRAMEWORK=" $CUSTOM_SERVER_COMMON_CONF_FILE)" > 0 ]] ; then
+
+        echo "Changing the UM logging framework to $LOG_FRAMEWORK"
+
+        get_highest_wrapper_java_index $SERVER_COMMON_CONF_FILE "wrapper.java.additional."
+        get_highest_wrapper_java_index $CUSTOM_SERVER_COMMON_CONF_FILE "wrapper.java.additional."
+
+        ((highest_wrapper_java_index = $highest_wrapper_java_index+1))
+        echo "Adding wrapper.java.additional.$highest_wrapper_java_index=-DLOG_FRAMEWORK=$LOG_FRAMEWORK to Tanuki custom wrapper configuration file"
+        echo "wrapper.java.additional.$highest_wrapper_java_index=-DLOG_FRAMEWORK=$LOG_FRAMEWORK" >> $CUSTOM_SERVER_COMMON_CONF_FILE
+
+        if ! [[ "$(grep -c "=-Dlog4j2.enable.threadlocals=" $SERVER_COMMON_CONF_FILE)" > 0  ||  "$(grep -c "=-Dlog4j2.enable.threadlocals=" $CUSTOM_SERVER_COMMON_CONF_FILE)" > 0 ]] ; then
+            ((highest_wrapper_java_index = $highest_wrapper_java_index+1))
+            echo "Adding wrapper.java.additional.$highest_wrapper_java_index=-Dlog4j2.enable.threadlocals=false to Tanuki custom wrapper configuration file"
+            echo "wrapper.java.additional.$highest_wrapper_java_index=-Dlog4j2.enable.threadlocals=false" >> $CUSTOM_SERVER_COMMON_CONF_FILE
+        fi
+    else
+        echo "UM logging framework is configured."
+    fi
+fi
 
 ###############################################################################
 # Function  Declaration: which does shutting down of um server
@@ -96,11 +123,26 @@ function stop_um_server {
 # to stop the running UM server if the server is running
 trap stop_um_server SIGTERM
 
+if [ ! -z "$LOG_FRAMEWORK" ] && [ "${LOG_FRAMEWORK,,}" == "log4j2" ]; then
+  echo "log4j2 framework is used."
+  # Change the wrapper console output format to only message
+  cd $UM_HOME/server/$INSTANCE_NAME/bin
+  sed -i "s|^wrapper.console.format=.*|wrapper.console.format=M|" $SERVER_COMMON_CONF_FILE
+  echo "Modified tanuki wrapper console output format to output only log messages"
+  # Change the wrapper log file output format to only message
+  sed -i "s|^wrapper.logfile.format=.*|wrapper.logfile.format=M|" $SERVER_COMMON_CONF_FILE
+  echo "Modified tanuki wrapper log file output format to output only log messages"
+  # Implicitly flush stdout after each line of output sent to console
+  if ! (grep -q "wrapper.console.flush=" $CUSTOM_SERVER_COMMON_CONF_FILE) ; then
+    echo "wrapper.console.flush=TRUE" >> $CUSTOM_SERVER_COMMON_CONF_FILE
+  fi
+else
 # For streaming the nirvana.log and UMRealmService.log to stdout
-cd $LOG_DIR
-touch $nirvanaLog $umRealmServiceLog
-tail -F $umRealmServiceLog | sed "s|^|[$umRealmServiceLog]: |" > /dev/stdout &
-tail -F $nirvanaLog | sed "s|^|[$nirvanaLog]: |" > /dev/stdout &
+  cd $LOG_DIR
+  touch $nirvanaLog $umRealmServiceLog
+  tail -F $umRealmServiceLog | sed "s|^|[$umRealmServiceLog]: |" > /dev/stdout &
+  tail -F $nirvanaLog | sed "s|^|[$nirvanaLog]: |" > /dev/stdout &
+fi
 
 #Add health monitor plugin in 'health' mountpath. this plugin will be used for docker health check.
 runUMTool.sh AddHealthMonitorPlugin -dirName=$DATA_DIR -protocol=http -adapter=0.0.0.0 -port=$PORT -mountpath=health -autostart=true
@@ -114,7 +156,11 @@ fi
 
 # run the umserver
 cd $UM_HOME/server/$INSTANCE_NAME/bin/
-./nserver > /dev/null & 
+if [ ! -z "$LOG_FRAMEWORK" ] && [ "${LOG_FRAMEWORK,,}" == "log4j2" ]; then
+  ./nserver > /dev/stdout &
+else
+  ./nserver > /dev/null &
+fi
 
 # wait till the server shutdown
 SERVER_PID=$!
