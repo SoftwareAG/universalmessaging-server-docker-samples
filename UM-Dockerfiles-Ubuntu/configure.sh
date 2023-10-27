@@ -44,12 +44,7 @@ sed -i "s|\(.*\)=UMRealmService.log|\1=$LOG_DIR/UMRealmService.log|" $SERVER_COM
 sed -i "s|\(.*\)="\""-DLOGFILE=\(.*\)|\1="\""-DLOGFILE=$LOG_DIR/nirvana.log"\""|" $SERVER_COMMON_CONF_FILE
 # Changing the um server port number to 9000. As the port number is fixed, irrespective of copied umserver port it will be always 9000. 
 sed -i "s|\(.*\)=-DADAPTER_0=\(.*\)|\1=-DADAPTER_0=nhp://0.0.0.0:$PORT|" $SERVER_COMMON_CONF_FILE
-#Changing the JMX Exporter agent destination and it's configuration file jmx_exporter_yaml
-sed -i "s|\(.*26=-javaagent:\)\(.*jmx_prometheus_javaagent.*\)|\1$UM_HOME/lib/jmx_prometheus_javaagent.jar=0.0.0.0:$JMX_AGENT_PORT:$UM_HOME/server/$INSTANCE_NAME/bin/jmx_exporter.yaml|" $SERVER_COMMON_CONF_FILE
-#Changing the JMX Exporter agent destination and it's configuration file jmx_sag_um_exporter.yaml, uncommenting to enable the JMX agent
-sed -i "s|\(.*wrapper.java.additional.27.*\)|\wrapper.java.additional.27=-javaagent:$UM_HOME/lib/jmx_prometheus_javaagent.jar=0.0.0.0:$JMX_AGENT_PORT:$UM_HOME/server/$INSTANCE_NAME/bin/jmx_sag_um_exporter.yaml|" $SERVER_COMMON_CONF_FILE
 
-#Iterating through the Server_Common.conf, Custom_Server_Common.conf files to get the highest wrapper_java_additional index used in the files
 highest_wrapper_java_additional_index=0
 
 function get_highest_wrapper_java_additional_index() {
@@ -67,13 +62,21 @@ function get_highest_wrapper_java_additional_index() {
   done < $filename
 }
 
+#Iterating through the Server_Common.conf, Custom_Server_Common.conf files to get the highest wrapper_java_additional index used in the files
 get_highest_wrapper_java_additional_index $SERVER_COMMON_CONF_FILE
 get_highest_wrapper_java_additional_index $CUSTOM_SERVER_COMMON_CONF_FILE
 
+#Changing the JMX Exporter agent destination and it's configuration file jmx_sag_um_exporter.yaml, uncommenting to enable the JMX agent
 ((highest_wrapper_java_additional_index=$highest_wrapper_java_additional_index+1))
-echo "Adding wrapper.java.additional."$highest_wrapper_java_additional_index"=-DENABLE_JMX=true to Tanuki wrapper configuration file"
+sed -i "s|\(.*/bin/jmx_sag_um_exporter.yaml*\)|\wrapper.java.additional.$highest_wrapper_java_additional_index=-javaagent:$UM_HOME/lib/jmx_prometheus_javaagent.jar=0.0.0.0:$JMX_AGENT_PORT:$UM_HOME/server/$INSTANCE_NAME/bin/jmx_sag_um_exporter.yaml|" $SERVER_COMMON_CONF_FILE
+
+highest_wrapper_java_additional_index=0
+
+get_highest_wrapper_java_additional_index $SERVER_COMMON_CONF_FILE
+get_highest_wrapper_java_additional_index $CUSTOM_SERVER_COMMON_CONF_FILE
 
 #Adding wrapper_java_additional index to enable the JMX config on start of the container
+((highest_wrapper_java_additional_index=$highest_wrapper_java_additional_index+1))
 sed -i "/bin\/jmx_sag_um_exporter.yaml/ a wrapper.java.additional.$highest_wrapper_java_additional_index=-DENABLE_JMX=true" $SERVER_COMMON_CONF_FILE
 
 # if the data directory is non-default location. Changing the location to fixed one in image.
