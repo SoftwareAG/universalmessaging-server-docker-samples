@@ -44,10 +44,25 @@ sed -i "s|\(.*\)=UMRealmService.log|\1=$LOG_DIR/UMRealmService.log|" $SERVER_COM
 sed -i "s|\(.*\)="\""-DLOGFILE=\(.*\)|\1="\""-DLOGFILE=$LOG_DIR/nirvana.log"\""|" $SERVER_COMMON_CONF_FILE
 # Changing the um server port number to 9000. As the port number is fixed, irrespective of copied umserver port it will be always 9000. 
 sed -i "s|\(.*\)=-DADAPTER_0=\(.*\)|\1=-DADAPTER_0=nhp://0.0.0.0:$PORT|" $SERVER_COMMON_CONF_FILE
+
+function get_highest_wrapper_java_property_index() {
+  filenames=$1
+  property_pattern=$2
+  highest_wrapper_java_index=`grep "$property_pattern" $filenames | grep -oP "$property_pattern\K[0-9]+" | sort -n | tail -n 1`
+}
+
 #Changing the JMX Exporter agent destination and it's configuration file jmx_exporter_yaml
-sed -i "s|\(.*26=-javaagent:\)\(.*jmx_prometheus_javaagent.*\)|\1$UM_HOME/lib/jmx_prometheus_javaagent.jar=0.0.0.0:$JMX_AGENT_PORT:$UM_HOME/server/$INSTANCE_NAME/bin/jmx_exporter.yaml|" $SERVER_COMMON_CONF_FILE
+highest_wrapper_java_index=0
+get_highest_wrapper_java_property_index "$SERVER_COMMON_CONF_FILE $CUSTOM_SERVER_COMMON_CONF_FILE" "wrapper.java.additional."
+((highest_wrapper_java_additional_index=$highest_wrapper_java_index+1))
+sed -i "s|\(.*bin/jmx_exporter.*\)|#\wrapper.java.additional.$highest_wrapper_java_additional_index=-javaagent:$UM_HOME/lib/jmx_prometheus_javaagent.jar=0.0.0.0:$JMX_PORT:$UM_HOME/server/$INSTANCE_NAME/bin/jmx_exporter.yaml|" $SERVER_COMMON_CONF_FILE
+
 #Changing the JMX Exporter agent destination and it's configuration file jmx_sag_um_exporter.yaml
-sed -i "s|\(.*27=-javaagent:\)\(.*jmx_prometheus_javaagent.*\)|\1$UM_HOME/lib/jmx_prometheus_javaagent.jar=0.0.0.0:$JMX_AGENT_PORT:$UM_HOME/server/$INSTANCE_NAME/bin/jmx_sag_um_exporter.yaml|" $SERVER_COMMON_CONF_FILE
+highest_wrapper_java_index=0
+get_highest_wrapper_java_property_index "$SERVER_COMMON_CONF_FILE $CUSTOM_SERVER_COMMON_CONF_FILE" "wrapper.java.additional."
+((highest_wrapper_java_additional_index=$highest_wrapper_java_index+1))
+sed -i "s|\(.*bin/jmx_sag_um_exporter.*\)|#\wrapper.java.additional.$highest_wrapper_java_additional_index=-javaagent:$UM_HOME/lib/jmx_prometheus_javaagent.jar=0.0.0.0:$JMX_PORT:$UM_HOME/server/$INSTANCE_NAME/bin/jmx_sag_um_exporter.yaml|" $SERVER_COMMON_CONF_FILE
+
 # if the data directory is non-default location. Changing the location to fixed one in image.
 sed -i "s|\(.*\)="\""-DDATADIR=\(.*\)|\1="\""-DDATADIR=$UM_HOME/server/$INSTANCE_NAME/data"\""|" $SERVER_COMMON_CONF_FILE
 # Change the default configuration in the config file for licence file
