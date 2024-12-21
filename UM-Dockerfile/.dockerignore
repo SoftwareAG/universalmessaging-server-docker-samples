@@ -22,9 +22,10 @@
 #exclude everything, necessary files will be retained below
 **
 
-#UniversalMessaging and common directory contains binaries and config files for UM
+#UniversalMessaging and common directory contains binaries and config files for UM. We also need jvm to copy it into the image.
 !UniversalMessaging
 !common
+!jvm
 
 #common/lib and common/bin contains unnecessary files
 common/lib/**
